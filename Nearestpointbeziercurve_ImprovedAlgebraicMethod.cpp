@@ -1,4 +1,4 @@
-// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+ï»¿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #define NOMINMAX
 #include "opennurbs.h"
@@ -64,7 +64,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 			w_coef.resize(order);
 			w_coef.assign(w_coef.size(), 0);
 #if 0
-			// ON_PolynomialCurve‚©‚çA q(u)AV(u)‚»‚ê‚¼‚ê‚ÌŒW”—ñ‚ğ“Ç‚İ‚İ
+			// ON_PolynomialCurveã‹ã‚‰ã€ q(u)ã€V(u)ãã‚Œãã‚Œã®ä¿‚æ•°åˆ—ã‚’èª­ã¿è¾¼ã¿
 			for (int j = 0, jinv = order-1; j < order; ++j, --jinv){
 				double w = w_coef[j] = pc.m_cv[jinv][3];
 				for (int i = 0; i < dim; ++i){
@@ -87,14 +87,14 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				}
 			}
 #endif
-			// V(u) ‚©‚ç V'(u)‚ğŒvZ
+			// V(u) ã‹ã‚‰ V'(u)ã‚’è¨ˆç®—
 			for (int i = 0; i < dim; ++i){
 				ONGEO_Polynomial_Differential(v_coef[i], order, dv_coef[i]);
 			}
 			dw_coef.resize(order-1);
 			ONGEO_Polynomial_Differential(&w_coef[0], order, &dw_coef[0]);
 
-			// w(u)V'(u) ‚Æ w'(u)V'(u)‚ğŒvZ
+			// w(u)V'(u) ã¨ w'(u)V'(u)ã‚’è¨ˆç®—
 			double *wdv_coef[3], *dwv_coef[3];
 			int order2_2 = order*2-2;
 			assign_coef3(wdv_coefs, order2_2, wdv_coef);
@@ -104,14 +104,14 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				ONGEO_Polynomial_Multiply(&dw_coef[0], order-1, v_coef[i], order, dwv_coef[i]);
 			}
 
-			// w(u)V'(u) - w'(u)V(u)‚ğŒvZ
+			// w(u)V'(u) - w'(u)V(u)ã‚’è¨ˆç®—
 			double *wdv_dwv_coef[3];
 			assign_coef3(wdv_dwv_coefs, order2_2, wdv_dwv_coef);
 			for (int i = 0; i < dim; ++i){
 				ONGEO_Polynomial_Subtract(wdv_coef[i], order2_2, dwv_coef[i], order2_2, wdv_dwv_coef[i], order2_2);
 			}
 
-			// w(u)p - V(u)‚ğŒvZ
+			// w(u)p - V(u)ã‚’è¨ˆç®—
 			double *wp_coef[3], *wp_v_coef[3];
 			assign_coef3(wp_coefs, order, wp_coef);
 			assign_coef3(wp_v_coefs, order, wp_v_coef);
@@ -120,7 +120,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				ONGEO_Polynomial_Subtract(wp_coef[j], order, v_coef[j], order, wp_v_coef[j], order);
 			}
 
-			// x, y, zŠe—v‘f‚É‚Â‚¢‚ÄA (w(u)V'(u) - w'(u)V(u)) x (w(u)p - V(u))‚ğŒvZ
+			// x, y, zå„è¦ç´ ã«ã¤ã„ã¦ã€ (w(u)V'(u) - w'(u)V(u)) x (w(u)p - V(u))ã‚’è¨ˆç®—
 			double *wdv_dwv_dot_wp_v_coef[3];
 			int order3_3 = order*3-3;
 			assign_coef3(wdv_dwv_dot_wp_v_coefs, order3_3, wdv_dwv_dot_wp_v_coef);
@@ -128,7 +128,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				ONGEO_Polynomial_Multiply(wdv_dwv_coef[i], order2_2, wp_v_coef[i], order, wdv_dwv_dot_wp_v_coef[i]);
 			}
 
-			// ã‹L‚ÌŒW”—ñ‚Ìx, y, zŠe—v‘f‚É‚Â‚¢‚Ä‘˜a‚ğæ‚è(“àÏ)A g(u)‚Æ‚·‚éB 
+			// ä¸Šè¨˜ã®ä¿‚æ•°åˆ—ã®x, y, zå„è¦ç´ ã«ã¤ã„ã¦ç·å’Œã‚’å–ã‚Š(å†…ç©)ã€ g(u)ã¨ã™ã‚‹ã€‚ 
 			g_coef.resize(order3_3);
 			if (dim == 1){
 				for (int h = 0; h < order3_3; ++h){
@@ -156,19 +156,19 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				}
 			}
 
-			// V(u) ‚©‚ç V'(u)‚ğŒvZ
+			// V(u) ã‹ã‚‰ V'(u)ã‚’è¨ˆç®—
 			for (int i = 0; i < dim; ++i){
 				ONGEO_Polynomial_Differential(v_coef[i], order, dv_coef[i]);
 			}
 
-			// p - V(u)‚ğŒvZ
+			// p - V(u)ã‚’è¨ˆç®—
 			double *p_v_coef[3];
 			assign_coef3(wp_v_coefs, order, p_v_coef);
 			for (int j = 0; j < dim; ++j){
 				ONGEO_Polynomial_Subtract(&static_cast<const double *>(pt_query)[j], 1, v_coef[j], order, p_v_coef[j], order);
 			}
 
-			// x, y, zŠe—v‘f‚É‚Â‚¢‚ÄA V'(u) x (p - V(u))‚ğŒvZ
+			// x, y, zå„è¦ç´ ã«ã¤ã„ã¦ã€ V'(u) x (p - V(u))ã‚’è¨ˆç®—
 			double *dv_dot_p_v_coef[3];
 			int order2_2 = order*2-2;
 			assign_coef3(wdv_dwv_dot_wp_v_coefs, order2_2, dv_dot_p_v_coef);
@@ -176,7 +176,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				ONGEO_Polynomial_Multiply(dv_coef[i], order-1, p_v_coef[i], order, dv_dot_p_v_coef[i]);
 			}
 
-			// ã‹L‚ÌŒW”—ñ‚Ìx, y, zŠe—v‘f‚É‚Â‚¢‚Ä‘˜a‚ğæ‚è(“àÏ)A g(u)‚Æ‚·‚éB 
+			// ä¸Šè¨˜ã®ä¿‚æ•°åˆ—ã®x, y, zå„è¦ç´ ã«ã¤ã„ã¦ç·å’Œã‚’å–ã‚Š(å†…ç©)ã€ g(u)ã¨ã™ã‚‹ã€‚ 
 			g_coef.resize(order2_2);
 			if (dim == 1){
 				for (int h = 0; h < order2_2; ++h){
@@ -195,7 +195,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 		dg_coefs.resize(order_g-1);
 		ONGEO_Polynomial_Differential(&g_coef[0], order_g, &dg_coefs[0]);
 
-		// g(u)‚Ì Sturm Sequence ‚ğ‹‚ß‚éB 
+		// g(u)ã® Sturm Sequence ã‚’æ±‚ã‚ã‚‹ã€‚ 
 		int num_strum = order_g * order_g;
 		sturm.resize(num_strum);
 		ONGEO_Polynomial_CreateSturmSequence(&g_coef[0], order_g, &sturm[0]);
@@ -256,7 +256,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 
 			ON_3dPoint ptc;
 			if (crange.first < crange.second){
-				// 2•ª–@
+				// 2åˆ†æ³•
 #if 0
 				int cnta = candidate_cnt_first[i];
 				for(;;){
@@ -279,13 +279,13 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 //					else crange.second = tc;
 				}
 #elif 1
-				// Brent–@
+				// Brentæ³•
 				tc = ONGEO_Polynomial_FindRootByBrentMethod(crange.first, crange.second, &g_coef[0], order_g);
 				gcv = ONGEO_Polynomial_Evaluate(tc, &g_coef[0], order_g);
 				ptc = bcs[k].PointAt(tc);
 				dist2_prev = (ptc-pt_query).LengthSquared();
 #elif 0
-				// ƒjƒ…[ƒgƒ“–@
+				// ãƒ‹ãƒ¥ãƒ¼ãƒˆãƒ³æ³•
 				for(;;){
 					double dt = ONGEO_Polynomial_Evaluate(tc, &g_coef[0], order_g) / ONGEO_Polynomial_Evaluate(tc, &dg_coefs[0], order_g-1);
 					if (std::abs(dt) < ON_ZERO_TOLERANCE) break;
@@ -299,7 +299,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				ptc = bcs[k].PointAt(tc);
 				dist2_prev = (ptc-pt_query).LengthSquared();
 			}
-			// ¡‚Ü‚Å‚ÌÅ’Z‹——£‚æ‚è‚à’Z‚¢ê‡‚ÍXV
+			// ä»Šã¾ã§ã®æœ€çŸ­è·é›¢ã‚ˆã‚Šã‚‚çŸ­ã„å ´åˆã¯æ›´æ–°
 			if (dist2_min > dist2_prev){
 				dist2_min = dist2_prev;
 				t = tc;

@@ -1,4 +1,4 @@
-// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+ï»¿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #define NOMINMAX
 
@@ -96,7 +96,7 @@ const RESULT TOLERANCE_INVALID = -3;
 template <int N> double Nearest_BBClipping(const ON_BezierCurve *bc_begin, const ON_BezierCurve *bc_end, double tolerance, const ON_3dPoint &pt_query, const ON_BezierCurve *&bc_nearest, double &t, ON_3dPoint &pt_nearest){
 	if (bc_begin > bc_end || !bc_begin) return INPUT_GEOMETRY_INVALID;
 	if (tolerance <= 0) return TOLERANCE_INVALID;
-	// first : t‚Ì”ÍˆÍ, second : •ªŠ„Œã‹Èü
+	// first : tã®ç¯„å›², second : åˆ†å‰²å¾Œæ›²ç·š
 	typedef std::pair<std::pair<double, double>, std::pair<ON_BezierCurve, const ON_BezierCurve *> > data;
 	std::list<data> data_buffer;
 	std::vector<data *> bcs1, bcs2, *bcs, *bcs_next, bcs_last;
@@ -105,7 +105,7 @@ template <int N> double Nearest_BBClipping(const ON_BezierCurve *bc_begin, const
 	ON_BezierCurve bc1, bc2;
 	double ts[3];
 	double certain_dist2 = std::numeric_limits<double>::max();
-	// certain_dist2 : ƒNƒGƒŠ‚Æ‹Èüã‚Ì“K“–‚ÉŒ©‚Â‚¯‚½‚Æ‚ ‚é“_‚Æ‚Ì‹——£‚Ì“ñæ‚Ì’†‚ÅÅ¬‚Ì’l
+	// certain_dist2 : ã‚¯ã‚¨ãƒªã¨æ›²ç·šä¸Šã®é©å½“ã«è¦‹ã¤ã‘ãŸã¨ã‚ã‚‹ç‚¹ã¨ã®è·é›¢ã®äºŒä¹—ã®ä¸­ã§æœ€å°ã®å€¤
 	double min_dist2 = 0;
 
 	const int num_ptsearch = 1;
@@ -165,9 +165,9 @@ template <int N> double Nearest_BBClipping(const ON_BezierCurve *bc_begin, const
 			min_dist2_cur = distance2<N>(bb, ON_3dPoint(pt_query_rotate));
 			if (min_dist2 > min_dist2_cur) min_dist2 = min_dist2_cur;
 			if (min_dist2 > certain_dist2 + ON_ZERO_TOLERANCE) continue;
-			// min_dist2 : ‹ÈüƒZƒOƒƒ“ƒgŒQ‚ÆƒNƒGƒŠ‚Æ‚Ì‹——£‚ÌÅ¬’l‚Ì“ñæ‚æ‚è‚à•K‚¸¬‚³‚¢’l
+			// min_dist2 : æ›²ç·šã‚»ã‚°ãƒ¡ãƒ³ãƒˆç¾¤ã¨ã‚¯ã‚¨ãƒªã¨ã®è·é›¢ã®æœ€å°å€¤ã®äºŒä¹—ã‚ˆã‚Šã‚‚å¿…ãšå°ã•ã„å€¤
 
-			// Še§Œä“_ŠÔ‹——£‚ªƒgƒŒƒ‰ƒ“ƒXˆÈ‰º‚Ìê‡•ªŠ„‘Å‚¿Ø‚è
+			// å„åˆ¶å¾¡ç‚¹é–“è·é›¢ãŒãƒˆãƒ¬ãƒ©ãƒ³ã‚¹ä»¥ä¸‹ã®å ´åˆåˆ†å‰²æ‰“ã¡åˆ‡ã‚Š
 			bool candidate = true;
 			for (int i = 0; i < order-1; ++i){
 				if ((ctrlpts[i]-ctrlpts[i+1]).LengthSquared() > tolerance2){

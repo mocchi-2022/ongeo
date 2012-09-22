@@ -1,4 +1,4 @@
-// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+ï»¿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #define NOMINMAX
@@ -9,11 +9,11 @@
 #include <windows.h>
 #include "ONGEO.h"
 
-// ‘½€®ŠÖ”‚É’l‚ğ‘ã“ü‚µ‚ÄŒvZ‚·‚éB
-// @param [in] t ‘ã“ü‚·‚é’l
-// @param [in] coef ‘½€®‚ÌŒW”—ñ
-// @param [in] num ŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @return ŒvZŒ‹‰Ê
+// å¤šé …å¼é–¢æ•°ã«å€¤ã‚’ä»£å…¥ã—ã¦è¨ˆç®—ã™ã‚‹ã€‚
+// @param [in] t ä»£å…¥ã™ã‚‹å€¤
+// @param [in] coef å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @return è¨ˆç®—çµæœ
 double ONGEO_Polynomial_Evaluate(double t, const double *coef, int num){
 	double s = coef[num-1];
 	double tt = t;
@@ -24,13 +24,13 @@ double ONGEO_Polynomial_Evaluate(double t, const double *coef, int num){
 	return s;
 }
 
-// 2‚Â‚Ì‘½€®‚ÌÏ‚ğ‘½€®‚Æ‚µ‚Ä“WŠJ‚·‚éB
-// @param [in] coef1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ
-// @param [in] num1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [in] coef2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ
-// @param [in] num2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_mul 2‚Â‚Ì‘½€®‚ÌÏ‚ğ“WŠJ‚µ‚½‘½€®‚ÌŒW”—ñ
-//	([num1+num2-2]Ÿ‚Ì‘½€®‚Æ‚È‚é‚½‚ßA“ü—Í‘¤‚Ånum1+num2-1ŒÂ•ª‚ÌŒW”‚Ì—Ìˆæ‚ğŠm•Û‚·‚é•K—v‚ª‚ ‚éB)
+// 2ã¤ã®å¤šé …å¼ã®ç©ã‚’å¤šé …å¼ã¨ã—ã¦å±•é–‹ã™ã‚‹ã€‚
+// @param [in] coef1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [in] coef2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_mul 2ã¤ã®å¤šé …å¼ã®ç©ã‚’å±•é–‹ã—ãŸå¤šé …å¼ã®ä¿‚æ•°åˆ—
+//	([num1+num2-2]æ¬¡ã®å¤šé …å¼ã¨ãªã‚‹ãŸã‚ã€å…¥åŠ›å´ã§num1+num2-1å€‹åˆ†ã®ä¿‚æ•°ã®é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚)
 void ONGEO_Polynomial_Multiply(const double *coef1, int num1,const  double *coef2, int num2, double *coef_mul){
 	int num_mul = num1 + num2 - 1;
 	for (int j = 0; j < num_mul; ++j){
@@ -43,14 +43,14 @@ void ONGEO_Polynomial_Multiply(const double *coef1, int num1,const  double *coef
 	}
 }
 
-// 2‚Â‚Ì‘½€®‚Ì˜a‚ğ‹‚ß‚éB
-// @param [in] coef1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num1 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef1‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [in] coef2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num2 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef2‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_add ‘½€®1 + ‘½€®2‚ğ¦‚·‘½€®‚ÌŒW”—ñ
-// @param [in] num o—Í‘½€®‚ÌŒW”‚ÌŒÂ” (num1 <= num ‚©‚Â num2 <= num‚Å‚ ‚é‚±‚Æ  coef1 ‚Ü‚½‚Í coef2‚Æ“¯‚¶êŠ‚ğw‚µ‚Ä‚¢‚Ä‚à“KØ‚ÉŒvZ‰Â”\)
-// @return true:¬Œ÷A false:¸”s
+// 2ã¤ã®å¤šé …å¼ã®å’Œã‚’æ±‚ã‚ã‚‹ã€‚
+// @param [in] coef1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num1 == 0 ã®ã¨ãã«é™ã‚Šã€coef1ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [in] coef2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num2 == 0 ã®ã¨ãã«é™ã‚Šã€coef2ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_add å¤šé …å¼1 + å¤šé …å¼2ã‚’ç¤ºã™å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num å‡ºåŠ›å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•° (num1 <= num ã‹ã¤ num2 <= numã§ã‚ã‚‹ã“ã¨  coef1 ã¾ãŸã¯ coef2ã¨åŒã˜å ´æ‰€ã‚’æŒ‡ã—ã¦ã„ã¦ã‚‚é©åˆ‡ã«è¨ˆç®—å¯èƒ½)
+// @return true:æˆåŠŸã€ false:å¤±æ•—
 bool ONGEO_Polynomial_Add(const double *coef1, int num1, const double *coef2, int num2, double *coef_add, int num_add){
 	if (num1 > num_add || num2 > num_add) return false;
 	if ((!coef1 && num1) || (!coef2 && num2)) return false;
@@ -74,14 +74,14 @@ bool ONGEO_Polynomial_Add(const double *coef1, int num1, const double *coef2, in
 	return true;
 }
 
-// 2‚Â‚Ì‘½€®‚Ì·‚ğ‹‚ß‚éB
-// @param [in] coef1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num1 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef1‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [in] coef2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num2 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef2‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_sub ‘½€®1 - ‘½€®2‚ğ¦‚·‘½€®‚ÌŒW”—ñ
-// @param [in] num o—Í‘½€®‚ÌŒW”‚ÌŒÂ” (num1 <= num ‚©‚Â num2 <= num‚Å‚ ‚é‚±‚Æ  coef1 ‚Ü‚½‚Í coef2‚Æ“¯‚¶êŠ‚ğw‚µ‚Ä‚¢‚Ä‚à“KØ‚ÉŒvZ‰Â”\)
-// @return true:¬Œ÷A false:¸”s
+// 2ã¤ã®å¤šé …å¼ã®å·®ã‚’æ±‚ã‚ã‚‹ã€‚
+// @param [in] coef1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num1 == 0 ã®ã¨ãã«é™ã‚Šã€coef1ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [in] coef2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num2 == 0 ã®ã¨ãã«é™ã‚Šã€coef2ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_sub å¤šé …å¼1 - å¤šé …å¼2ã‚’ç¤ºã™å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num å‡ºåŠ›å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•° (num1 <= num ã‹ã¤ num2 <= numã§ã‚ã‚‹ã“ã¨  coef1 ã¾ãŸã¯ coef2ã¨åŒã˜å ´æ‰€ã‚’æŒ‡ã—ã¦ã„ã¦ã‚‚é©åˆ‡ã«è¨ˆç®—å¯èƒ½)
+// @return true:æˆåŠŸã€ false:å¤±æ•—
 bool ONGEO_Polynomial_Subtract(const double *coef1, int num1, const double *coef2, int num2, double *coef_sub, int num_sub){
 	if (num1 > num_sub || num2 > num_sub) return false;
 	if ((!coef1 && num1) || (!coef2 && num2)) return false;
@@ -105,12 +105,12 @@ bool ONGEO_Polynomial_Subtract(const double *coef1, int num1, const double *coef
 	return true;
 }
 
-// ‘½€®‚ğˆêŠK”÷•ª‚·‚éB
-// @param [in] coef ‘½€®‚ÌŒW”—ñ
-// @param [in] num ‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_dif ”÷•ª‚µ‚½‘½€®‚ÌŒW”—ñ
-//    (ŒÄ‚Ño‚µŒ³‚Ånum-1ŒÂ•ª‚Ì—Ìˆæ‚ğŠm•Û‚·‚é‚±‚Æ
-//     coef‚Æ“¯‚¶êŠ‚ÉŒ‹‰Ê‚ğã‘‚«‚µ‚½‚¢ê‡‚ÍA‚±‚Ìˆø”‚Æ‚µ‚Ä&coef[1]‚ğ“n‚µA–{ŠÖ”ŒÄo‚µŒã‚Écoef[0] = 0.0‚Æ‚·‚é‚±‚Æ)
+// å¤šé …å¼ã‚’ä¸€éšå¾®åˆ†ã™ã‚‹ã€‚
+// @param [in] coef å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_dif å¾®åˆ†ã—ãŸå¤šé …å¼ã®ä¿‚æ•°åˆ—
+//    (å‘¼ã³å‡ºã—å…ƒã§num-1å€‹åˆ†ã®é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹ã“ã¨
+//     coefã¨åŒã˜å ´æ‰€ã«çµæœã‚’ä¸Šæ›¸ãã—ãŸã„å ´åˆã¯ã€ã“ã®å¼•æ•°ã¨ã—ã¦&coef[1]ã‚’æ¸¡ã—ã€æœ¬é–¢æ•°å‘¼å‡ºã—å¾Œã«coef[0] = 0.0ã¨ã™ã‚‹ã“ã¨)
 void ONGEO_Polynomial_Differential(const double *coef, int num, double *coef_dif){
 	for (int i = num - 2; i >= 0; --i){
 		coef_dif[i] = (num - 1 - i) * coef[i];
@@ -118,10 +118,10 @@ void ONGEO_Polynomial_Differential(const double *coef, int num, double *coef_dif
 }
 
 namespace {
-	// ŒW”—ñ‚Ìâ‘Î’l‚ÌÅ‘å’l‚ÅŒW”—ñ‚ğ³‹K‰»‚µ‚½‚Æ‚«A‚Ÿ‘¤‚©‚ç‡‚ÉA
-	// â‘Î’l‚ªON_ZERO_TOLERANCEˆÈ‰º‚Æ‚È‚éŒW”‚ğ’T‚µ‘±‚¯AŒ©‚Â‚©‚éŒÀ‚è0‚ğ“ü‚ê‚éB
+	// ä¿‚æ•°åˆ—ã®çµ¶å¯¾å€¤ã®æœ€å¤§å€¤ã§ä¿‚æ•°åˆ—ã‚’æ­£è¦åŒ–ã—ãŸã¨ãã€é«˜æ¬¡å´ã‹ã‚‰é †ã«ã€
+	// çµ¶å¯¾å€¤ãŒON_ZERO_TOLERANCEä»¥ä¸‹ã¨ãªã‚‹ä¿‚æ•°ã‚’æ¢ã—ç¶šã‘ã€è¦‹ã¤ã‹ã‚‹é™ã‚Š0ã‚’å…¥ã‚Œã‚‹ã€‚
 	int ZeroRoundSturmSequence(double *strum_line, int num){
-		// â‘Î’l‚ÌÅ‘å’l
+		// çµ¶å¯¾å€¤ã®æœ€å¤§å€¤
 		double absmax = 0;
 		for (int i = 0; i < num; ++i){
 			double a = std::abs(strum_line[i]);
@@ -138,10 +138,10 @@ namespace {
 	}
 }
 
-// ‘½€®‚ÌŒW”—ñ‚©‚çSturm—ñ‚ğ¶¬‚·‚éB
-// @param coef [in] ‘½€®‚ÌŒW”—ñ (Ÿ”‚Ì‘å‚«‚¢‡)
-// @param num [in] ‘½€®‚ÌŒW”‚Ì”
-// @param s [out] Sturm—ñ (ŒÄ‚Ño‚µŒ³‚Ånf*nfŒÂ•ª‚Ì—Ìˆæ‚ğŠm•Û‚·‚é‚±‚Æ)
+// å¤šé …å¼ã®ä¿‚æ•°åˆ—ã‹ã‚‰Sturmåˆ—ã‚’ç”Ÿæˆã™ã‚‹ã€‚
+// @param coef [in] å¤šé …å¼ã®ä¿‚æ•°åˆ— (æ¬¡æ•°ã®å¤§ãã„é †)
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•°
+// @param s [out] Sturmåˆ— (å‘¼ã³å‡ºã—å…ƒã§nf*nfå€‹åˆ†ã®é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹ã“ã¨)
 void ONGEO_Polynomial_CreateSturmSequence(const double *coef, int num, double *strum){
 	int max_nz = 0;
 //	for (max_nz = 0; coef[max_nz] == 0 && max_nz < num; ++max_nz);
@@ -175,11 +175,11 @@ void ONGEO_Polynomial_CreateSturmSequence(const double *coef, int num, double *s
 	}
 }
 
-// Sturm—ñ‚ğ—p‚¢‚ÄAw’è‚µ‚½’l‚Å‚Ì•„†”½“]‰ñ”‚ğŒvZ‚·‚éB
-// @param t [in] ’l
-// @param sturm [in] Sturm—ñ
-// @param num [in] ‘½€®‚ÌŒW”‚Ì” (Sturm—ñ‚Ì”z—ñ’·‚Ínum*num)
-// @return •„†”½“]‰ñ”
+// Sturmåˆ—ã‚’ç”¨ã„ã¦ã€æŒ‡å®šã—ãŸå€¤ã§ã®ç¬¦å·åè»¢å›æ•°ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+// @param t [in] å€¤
+// @param sturm [in] Sturmåˆ—
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•° (Sturmåˆ—ã®é…åˆ—é•·ã¯num*num)
+// @return ç¬¦å·åè»¢å›æ•°
 int ONGEO_Polynomial_NumberOfSignChangesOfSturmSequence(double t, const double *strum, int num){
 	int count = 0;
 	double fp;
@@ -197,12 +197,12 @@ int ONGEO_Polynomial_NumberOfSignChangesOfSturmSequence(double t, const double *
 	return count;
 }
 
-// Sturm—ñ‚ğ—p‚¢‚ÄAw’è‚µ‚½‹æŠÔ“à‚Ì‘½€®‚Ìª‚Ì”‚ğŒvZ‚·‚éB
-// @param t1 [in] ‹æŠÔ‚Ì‰ºŒÀ
-// @param t2 [in] ‹æŠÔ‚ÌãŒÀ(t1 < t2 ‚Å‚ ‚é‚±‚Æ)
-// @param sturm [in] Sturm—ñ
-// @param num [in] ‘½€®‚ÌŒW”‚Ì” (Sturm—ñ‚Ì”z—ñ’·‚Ínum*num)
-// @return ‰ğ‚ÌŒÂ”(ƒGƒ‰[‚Ìê‡A•‰”)
+// Sturmåˆ—ã‚’ç”¨ã„ã¦ã€æŒ‡å®šã—ãŸåŒºé–“å†…ã®å¤šé …å¼ã®æ ¹ã®æ•°ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+// @param t1 [in] åŒºé–“ã®ä¸‹é™
+// @param t2 [in] åŒºé–“ã®ä¸Šé™(t1 < t2 ã§ã‚ã‚‹ã“ã¨)
+// @param sturm [in] Sturmåˆ—
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•° (Sturmåˆ—ã®é…åˆ—é•·ã¯num*num)
+// @return è§£ã®å€‹æ•°(ã‚¨ãƒ©ãƒ¼ã®å ´åˆã€è² æ•°)
 int ONGEO_Polynomial_CalculateNumRoot(double t1, double t2, const double *strum, int num){
 	if (t1 > t2) return -1;
 	return
@@ -253,12 +253,12 @@ int ONGEO_Polynomial_CalcBinomialCoef(int m, int n){
 }
 
 
-// Brent–@‚ğ—p‚¢‚Äª‚ğ‹‚ß‚éB‹æŠÔ ti1 - ti2 ‚Ì’†‚Å’P’²‘‰ÁA‚Ü‚½‚Í’P’²Œ¸­‚Å‚ ‚é‚±‚ÆB
-// @param ti1 [in] ‹·‚ß‚½‚¢‹æŠÔ‚Ì‰ºŒÀ
-// @param ti2 [in] ‹·‚ß‚½‚¢‹æŠÔ‚ÌãŒÀ ti1 < ti2‚Å‚ ‚é‚±‚ÆB
-// @param coef [in] ‘½€®‚ÌŒW”
-// @param num [in] ‘½€®‚ÌŒW”‚Ì”
-// @return ª‚Æ‚È‚é’l
+// Brentæ³•ã‚’ç”¨ã„ã¦æ ¹ã‚’æ±‚ã‚ã‚‹ã€‚åŒºé–“ ti1 - ti2 ã®ä¸­ã§å˜èª¿å¢—åŠ ã€ã¾ãŸã¯å˜èª¿æ¸›å°‘ã§ã‚ã‚‹ã“ã¨ã€‚
+// @param ti1 [in] ç‹­ã‚ãŸã„åŒºé–“ã®ä¸‹é™
+// @param ti2 [in] ç‹­ã‚ãŸã„åŒºé–“ã®ä¸Šé™ ti1 < ti2ã§ã‚ã‚‹ã“ã¨ã€‚
+// @param coef [in] å¤šé …å¼ã®ä¿‚æ•°
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•°
+// @return æ ¹ã¨ãªã‚‹å€¤
 // Reference : R.P.Brent,
 //   "An algorithm with guaranteed convergence for finding a zero of a function".
 //    The Computer Journal, 14(1971), pp.422-425.
@@ -268,9 +268,9 @@ double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const doub
 	double fb = ONGEO_Polynomial_Evaluate(b, coef, num);
 	double c = a, fc = fa, d, dprev;
 	d = dprev = b - a;
-	// d : û‘©ˆ—‚Åb‚ğ“®‚©‚·—Ê
+	// d : åæŸå‡¦ç†ã§bã‚’å‹•ã‹ã™é‡
 	for(;;){
-		// ª‚É‹ß‚¢•û‚ğb,fbA‰“‚¢•û‚ğa=c,fa=fc‚Æ‚·‚éB
+		// æ ¹ã«è¿‘ã„æ–¹ã‚’b,fbã€é ã„æ–¹ã‚’a=c,fa=fcã¨ã™ã‚‹ã€‚
 		if (std::abs(fc) < std::abs(fb)){
 			a = b, b = c, c = a;
 			fa = fb, fb = fc, fc = fa;
@@ -280,7 +280,7 @@ double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const doub
 		double m = 0.5 * c_b;
 		if (std::abs(m) <= tol || fb == 0) break;
 
-		// bisection‚Ìê‡‚ÌdAdprev
+		// bisectionã®å ´åˆã®dã€dprev
 		d = dprev = m;
 		if (std::abs(dprev) >= tol && std::abs(fa) > std::abs(fb)){
 			double r3 = fb / fa;
@@ -299,13 +299,13 @@ double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const doub
 			if (p > 0) q = -q;
 			else p = -p;
 			if (2.0 * p < 1.5 * c_b * q - std::abs(tol * q) && p < std::abs(0.5 * dprev * q)){
-				// ã‹LğŒ‚É‡‚¤ê‡‚ÍAd‚Ædprev‚ğlinear interpolationA
-				// ‚Ü‚½‚Íinverse quadratic interpolation—R—ˆ‚Ì‚à‚Ì‚É‘‚«Š·‚¦‚éB
+				// ä¸Šè¨˜æ¡ä»¶ã«åˆã†å ´åˆã¯ã€dã¨dprevã‚’linear interpolationã€
+				// ã¾ãŸã¯inverse quadratic interpolationç”±æ¥ã®ã‚‚ã®ã«æ›¸ãæ›ãˆã‚‹ã€‚
 				dprev = d;
 				d = p / q;
 			}
 		}
-		// a, fa, b, fb‚ğXV
+		// a, fa, b, fbã‚’æ›´æ–°
 		a = b, fa = fb;
 		b += (std::abs(d) > tol) ? d : ((m > 0) ? tol : -tol);
 		fb = ONGEO_Polynomial_Evaluate(b, coef, num);
@@ -317,21 +317,21 @@ double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const doub
 	return b;
 }
 #if 0
-// Smale‚ÌŠî€‚ğ—p‚¢‚Äª‚Ì”ÍˆÍ‚ğ‹·‚ß‚éB‹æŠÔ ti1 - ti2 ‚Ì’†‚Å’P’²‘‰ÁA‚Ü‚½‚Í’P’²Œ¸­‚Å‚ ‚é‚±‚ÆB
-// @param ti1 [in] ‹·‚ß‚½‚¢‹æŠÔ‚Ì‰ºŒÀ
-// @param ti2 [in] ‹·‚ß‚½‚¢‹æŠÔ‚ÌãŒÀ ti1 < ti2‚Å‚ ‚é‚±‚ÆB
-// @param coef [in] ‘½€®‚ÌŒW”
-// @param num [in] ‘½€®‚ÌŒW”‚Ì”
-// @param to1 [out] ‹·‚ß‚½‹æŠÔ‚Ì‰ºŒÀ
-// @param to2 [out] ‹·‚ß‚½‹æŠÔ‚ÌãŒÀ
-// @return true:¬Œ÷A false:¸”s
+// Smaleã®åŸºæº–ã‚’ç”¨ã„ã¦æ ¹ã®ç¯„å›²ã‚’ç‹­ã‚ã‚‹ã€‚åŒºé–“ ti1 - ti2 ã®ä¸­ã§å˜èª¿å¢—åŠ ã€ã¾ãŸã¯å˜èª¿æ¸›å°‘ã§ã‚ã‚‹ã“ã¨ã€‚
+// @param ti1 [in] ç‹­ã‚ãŸã„åŒºé–“ã®ä¸‹é™
+// @param ti2 [in] ç‹­ã‚ãŸã„åŒºé–“ã®ä¸Šé™ ti1 < ti2ã§ã‚ã‚‹ã“ã¨ã€‚
+// @param coef [in] å¤šé …å¼ã®ä¿‚æ•°
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•°
+// @param to1 [out] ç‹­ã‚ãŸåŒºé–“ã®ä¸‹é™
+// @param to2 [out] ç‹­ã‚ãŸåŒºé–“ã®ä¸Šé™
+// @return true:æˆåŠŸã€ false:å¤±æ•—
 bool ONGEO_Polynomial_TightenRootRangeBySmale(double ti1, double ti2, double *coef, int num, double &to1, double &to2) {
-	/// Ql•¶Œ£
+	/// å‚è€ƒæ–‡çŒ®
 	/// Yinyu Ye,
 	/// Combining Binary Search and Newton's Method to Compute Real Roots for a Class of Real Functions.
 	/// Journal Of Complexity 10, pp 271-280 (1994)
 
-	// Å‘åŸ”‚ğ‹‚ß‚éB
+	// æœ€å¤§æ¬¡æ•°ã‚’æ±‚ã‚ã‚‹ã€‚
 	int d = num;
 	for (int i = 0; i < num; ++i){
 		if (std::abs(coef[i]) < ON_ZERO_TOLERANCE) --d;

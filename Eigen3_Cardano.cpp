@@ -1,10 +1,10 @@
-/*
+ï»¿/*
  * eigen3_cardano
  * Copylight (C) 2012 mocchi
  * mocchi_2003@yahoo.co.jp
  * License: Boost ver.1
  */
-// ƒJƒ‹ƒ_ƒm‚ÌŒö®‚ÅŒÅ—L’l‚ğ‹‚ßA˜A—§1Ÿ•û’ö®‚ğ’¼Ú‰ğ‚¢‚ÄŒÅ—LƒxƒNƒgƒ‹‚ğ‹‚ß‚éƒvƒƒOƒ‰ƒ€
+// ã‚«ãƒ«ãƒ€ãƒã®å…¬å¼ã§å›ºæœ‰å€¤ã‚’æ±‚ã‚ã€é€£ç«‹1æ¬¡æ–¹ç¨‹å¼ã‚’ç›´æ¥è§£ã„ã¦å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,19 +30,19 @@ struct polar_rep{
 
 // http://people.freebsd.org/~lstewart/references/apple_tr_kt32_cuberoot.pdf
 double cubert_real(double a){
-	// a ‚ğA b * 2^n ‚É•ª‰ğ (0.125 <= b < 1.0A n‚Í3‚Ì”{”)
+	// a ã‚’ã€ b * 2^n ã«åˆ†è§£ (0.125 <= b < 1.0ã€ nã¯3ã®å€æ•°)
 	int n;
 	double b = std::frexp(a, &n);
 	int na = (n < 0) ? ((-n) % 3) : ((3 - (n % 3)) % 3);
 	n += na;
 	b /= static_cast<double>(1 << na);
 
-	// ‚±‚Ì“_‚Ån‚Í•K‚¸3‚Ì”{”
-	// w”•”‚Ín/3‚Å—§•ûª‚ğæ‚Á‚½‚±‚Æ‚É‚È‚éB
+	// ã“ã®æ™‚ç‚¹ã§nã¯å¿…ãš3ã®å€æ•°
+	// æŒ‡æ•°éƒ¨ã¯n/3ã§ç«‹æ–¹æ ¹ã‚’å–ã£ãŸã“ã¨ã«ãªã‚‹ã€‚
 	n /= 3;
 
-	// ‰¼”•”‚Ì—§•ûª
-	b = -0.46946116*b*b + 1.072302*b + 0.3812513; // ¸“x 6bit
+	// ä»®æ•°éƒ¨ã®ç«‹æ–¹æ ¹
+	b = -0.46946116*b*b + 1.072302*b + 0.3812513; // ç²¾åº¦ 6bit
 
 	double r = std::ldexp(b, n);
 
@@ -67,7 +67,7 @@ bool ONGEO_EigenValue3_Cardano(double *A[], double l[6]){
 	const double a11 = A[0][0], a12 = A[0][1], a13 = A[0][2];
 	const double a21 = A[1][0], a22 = A[1][1], a23 = A[1][2];
 	const double a31 = A[2][0], a32 = A[2][1], a33 = A[2][2];
-	// ŒÅ—L•û’ö® |A - lI| = 0‚©‚çl‚Ì•û’ö®‚ğì‚éB
+	// å›ºæœ‰æ–¹ç¨‹å¼ |A - lI| = 0ã‹ã‚‰lã®æ–¹ç¨‹å¼ã‚’ä½œã‚‹ã€‚
 	const double a = -1.0;
 	const double b = a11 + a22 + a33;
 	const double c = -a11*a22 - a11*a33 + a12*a21 + a13*a31 - a22*a33 + a23*a32;
@@ -75,20 +75,20 @@ bool ONGEO_EigenValue3_Cardano(double *A[], double l[6]){
 		  a11*a22*a33 - a11*a23*a32 - a12*a21*a33
 		+ a12*a23*a31 + a13*a21*a32 - a13*a22*a31;
 
-	// a*l^3 + b*l^2 + c*l + d = 0 ‚ğOŸ•û’ö®‚Ì‰ğ‚ÌŒö®‚Å‰ğ‚­
-	//  R1 : —§•ûª‚Ì’†‚Ì•½•ûª‚Ì’†g
+	// a*l^3 + b*l^2 + c*l + d = 0 ã‚’ä¸‰æ¬¡æ–¹ç¨‹å¼ã®è§£ã®å…¬å¼ã§è§£ã
+	//  R1 : ç«‹æ–¹æ ¹ã®ä¸­ã®å¹³æ–¹æ ¹ã®ä¸­èº«
 	dcomp_t R1sq;
 	double R1 = 3*(27*a*a*d*d - 18*a*b*c*d + 4*a*c*c*c + 4*b*b*b*d - b*b*c*c);
 	if (R1 >= 0) R1sq = std::sqrt(R1)*12.0*a;
 	else R1sq = dcomp_t(0, std::sqrt(-R1)*12.0*a);
-	//  R2 : —§•ûª‚Ì’†g‚©‚ç•½•ûª‚Ì€‚ğœ‚¢‚½‚à‚Ì
+	//  R2 : ç«‹æ–¹æ ¹ã®ä¸­èº«ã‹ã‚‰å¹³æ–¹æ ¹ã®é …ã‚’é™¤ã„ãŸã‚‚ã®
 	dcomp_t R2(4*(-27*a*a*d + 9*a*b*c - 2*b*b*b), 0);
 
 	dcomp_t R2_plus_R1sq = R2 + R1sq;
 	dcomp_t R2_minus_R1sq = R2 - R1sq;
 	polar_rep R2_1cb = cubert_polar_rep(R2_plus_R1sq);
-	// R2_plus_R1sq‚ÆR2_minus_R1sq‚ÍA‚Æ‚à‚ÉÀ”(R1‚ª³‚Ì‚Æ‚«)A‚Ü‚½‚Í•¡‘f‹¤–ğ‚ÌŠÖŒW(R1‚ª•‰‚Ì‚Æ‚«)
-	// •¡‘f‹¤–ğ(R2_minus_R1sq = std::conj(R2_plus_R1sq))‚Ì‚Æ‚«A R2_2cb = std::conj(R2_1cb)
+	// R2_plus_R1sqã¨R2_minus_R1sqã¯ã€ã¨ã‚‚ã«å®Ÿæ•°(R1ãŒæ­£ã®ã¨ã)ã€ã¾ãŸã¯è¤‡ç´ å…±å½¹ã®é–¢ä¿‚(R1ãŒè² ã®ã¨ã)
+	// è¤‡ç´ å…±å½¹(R2_minus_R1sq = std::conj(R2_plus_R1sq))ã®ã¨ãã€ R2_2cb = std::conj(R2_1cb)
 	polar_rep R2_2cb = (R2_1cb.arg != 0) ? R2_1cb.conj() : polar_rep(cubert_real(R2_minus_R1sq.real()), 0);
 
 	double a3i = 1.0 / (3.0*a);
@@ -107,7 +107,7 @@ bool ONGEO_EigenValue3_Cardano(double *A[], double l[6]){
 		dcomp_t s3 = (-2*b+w2*R2_1cb.abs+w1*R2_2cb.abs)*a6i;
 		l[4] = s3.real(), l[5] = s3.imag();
 	}
-	// Še‰ğ‚Ì¸“x‚ğƒjƒ…[ƒgƒ“–@‚Åã‚°‚éB
+	// å„è§£ã®ç²¾åº¦ã‚’ãƒ‹ãƒ¥ãƒ¼ãƒˆãƒ³æ³•ã§ä¸Šã’ã‚‹ã€‚
 	for (int i = 0; i < 6; ++i){
 		if (l[i] == 0) continue;
 		double ll = l[i];
@@ -168,9 +168,9 @@ bool ONGEO_EigenVector3(double *A[], double l, double v[3]){
 }
 
 void ONGEO_Create_Covariance_Matrix3x3(double *vecs, int num_vecs, bool calc_corr_coef_matrix, double *A[3], double *meanvec){
-	// •ªU‹¤•ªUs—ñ‚ğ‹‚ß‚éB
+	// åˆ†æ•£å…±åˆ†æ•£è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ã€‚
 	ON_3dVector mean = ON_3dVector(0,0,0);
-	// ‚Ü‚¸‚ÍŠe¬•ª‚Ì•½‹Ï
+	// ã¾ãšã¯å„æˆåˆ†ã®å¹³å‡
 	for (int i = 0, i3 = 0; i < num_vecs; ++i, i3 += 3){
 		mean += ON_3dVector(vecs + i3);
 	}
@@ -180,7 +180,7 @@ void ONGEO_Create_Covariance_Matrix3x3(double *vecs, int num_vecs, bool calc_cor
 	A[1][0] = A[1][1] = A[1][2] = 0;
 	A[2][0] = A[2][1] = A[2][2] = 0;
 
-	// •ªUE‹¤•ªUs—ñì¬
+	// åˆ†æ•£ãƒ»å…±åˆ†æ•£è¡Œåˆ—ä½œæˆ
 	for (int i = 0, i3 = 0; i < num_vecs; ++i, i3 += 3){
 		ON_3dVector dif = ON_3dVector(vecs + i3) - mean;
 		A[0][0] += dif.x * dif.x;
@@ -194,7 +194,7 @@ void ONGEO_Create_Covariance_Matrix3x3(double *vecs, int num_vecs, bool calc_cor
 	A[1][1] *= denom, A[1][2] *= denom, A[2][2] *= denom;
 
 	if (calc_corr_coef_matrix){
-		// ‘ŠŠÖs—ñ‚É•ÏŠ·
+		// ç›¸é–¢è¡Œåˆ—ã«å¤‰æ›
 		double s[3] = {std::sqrt(A[0][0]), std::sqrt(A[1][1]), std::sqrt(A[2][2])};
 		A[0][0] = (s[0] < ON_ZERO_TOLERANCE) ? 0.0 : 1.0;
 		A[1][1] = (s[1] < ON_ZERO_TOLERANCE) ? 0.0 : 1.0;
@@ -211,7 +211,7 @@ void ONGEO_Create_Covariance_Matrix3x3(double *vecs, int num_vecs, bool calc_cor
 	}
 }
 
-// •ªUE‹¤•ªUs—ñ‚©‚ç‘ŠŠÖŒW”s—ñ‚ğ¶¬
+// åˆ†æ•£ãƒ»å…±åˆ†æ•£è¡Œåˆ—ã‹ã‚‰ç›¸é–¢ä¿‚æ•°è¡Œåˆ—ã‚’ç”Ÿæˆ
 void ONGEO_Covariance2CorrCoef_Matrix3x3(double *A[3], double *B[3]){
 	double s[3] = {std::sqrt(A[0][0]), std::sqrt(A[1][1]), std::sqrt(A[2][2])};
 	B[0][0] = (s[0] < ON_ZERO_TOLERANCE) ? 0.0 : 1.0;

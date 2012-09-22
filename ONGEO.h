@@ -1,4 +1,4 @@
-// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+ï»¿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #include "opennurbs.h"
 
@@ -14,78 +14,78 @@
 #define ONGEO_CLASS
 #define ONGEO_DECL
 #endif
-/// ƒNƒGƒŠ“_‚ÉÅ‚à‹ß‚¢—L—Bezier‹Èüã‚Ì“_‚ğ‹‚ß‚é(BBClipping‚æ‚è‚à‚‘¬)B
-/// @param [in] bcs ƒxƒWƒG‹Èü‚Ì”z—ñ‚Ìæ“ª—v‘f‚Ìƒ|ƒCƒ“ƒ^
-/// @param [in] num_bcs ƒxƒWƒG‹Èü‚Ì”
-/// @param [in] tolerance ‹——£ƒgƒŒƒ‰ƒ“ƒX
-/// @param [in] pt_query ƒNƒGƒŠ“_
-/// @param [out] bc_nearest Å‚à‹ß‚¢“_‚ª‘®‚µ‚Ä‚¢‚éƒxƒWƒG‹Èü
-/// @param [out] t Å‚à‹ß‚¢“_‚ª‘®‚µ‚Ä‚¢‚éƒxƒWƒG‹Èüã‚Å‚Ìƒpƒ‰ƒ[ƒ^’l(ŠeƒxƒWƒG‹Èü‚Ìƒpƒ‰ƒ[ƒ^‚Ì”ÍˆÍ‚Í0 - 1)
-/// @param [out] pt_nearest Å‚à‹ß‚¢“_‚ÌOŸŒ³À•W
-/// @return ƒNƒGƒŠ“_‚ÆÅ‹ß“_‚Æ‚Ì‹——£
+/// ã‚¯ã‚¨ãƒªç‚¹ã«æœ€ã‚‚è¿‘ã„æœ‰ç†Bezieræ›²ç·šä¸Šã®ç‚¹ã‚’æ±‚ã‚ã‚‹(BBClippingã‚ˆã‚Šã‚‚é«˜é€Ÿ)ã€‚
+/// @param [in] bcs ãƒ™ã‚¸ã‚¨æ›²ç·šã®é…åˆ—ã®å…ˆé ­è¦ç´ ã®ãƒã‚¤ãƒ³ã‚¿
+/// @param [in] num_bcs ãƒ™ã‚¸ã‚¨æ›²ç·šã®æ•°
+/// @param [in] tolerance è·é›¢ãƒˆãƒ¬ãƒ©ãƒ³ã‚¹
+/// @param [in] pt_query ã‚¯ã‚¨ãƒªç‚¹
+/// @param [out] bc_nearest æœ€ã‚‚è¿‘ã„ç‚¹ãŒå±ã—ã¦ã„ã‚‹ãƒ™ã‚¸ã‚¨æ›²ç·š
+/// @param [out] t æœ€ã‚‚è¿‘ã„ç‚¹ãŒå±ã—ã¦ã„ã‚‹ãƒ™ã‚¸ã‚¨æ›²ç·šä¸Šã§ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤(å„ãƒ™ã‚¸ã‚¨æ›²ç·šã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ç¯„å›²ã¯0 - 1)
+/// @param [out] pt_nearest æœ€ã‚‚è¿‘ã„ç‚¹ã®ä¸‰æ¬¡å…ƒåº§æ¨™
+/// @return ã‚¯ã‚¨ãƒªç‚¹ã¨æœ€è¿‘ç‚¹ã¨ã®è·é›¢
 ONGEO_DECL double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurve *bcs, int num_bcs, double tolerance, const ON_3dPoint &pt_query, const ON_BezierCurve *&bc_nearest, double &t, ON_3dPoint &pt_nearest);
 
-/// w’è‚µ‚½“_‚ÉÅ‚à‹ß‚¢—L—Bezier‹Èüã‚Ì“_‚ğ‹‚ß‚é(‘¬“x‚ª’x‚¢‚½‚ß”ñ„§)B
-/// @param [in] bcs ƒxƒWƒG‹Èü‚Ì”z—ñ‚Ìæ“ª—v‘f‚Ìƒ|ƒCƒ“ƒ^
-/// @param [in] num_bcs ƒxƒWƒG‹Èü‚Ì”
-/// @param [in] tolerance ‹——£ƒgƒŒƒ‰ƒ“ƒX
-/// @param [in] pt_query ƒNƒGƒŠ“_
-/// @param [out] bc_nearest Å‚à‹ß‚¢“_‚ª‘®‚µ‚Ä‚¢‚éƒxƒWƒG‹Èü
-/// @param [out] t Å‚à‹ß‚¢“_‚ª‘®‚µ‚Ä‚¢‚éƒxƒWƒG‹Èüã‚Å‚Ìƒpƒ‰ƒ[ƒ^’l(ŠeƒxƒWƒG‹Èü‚Ìƒpƒ‰ƒ[ƒ^‚Ì”ÍˆÍ‚Í0 - 1)
-/// @param [out] pt_nearest Å‚à‹ß‚¢“_‚ÌOŸŒ³À•W
-/// @return ƒNƒGƒŠ“_‚ÆÅ‹ß“_‚Æ‚Ì‹——£
+/// æŒ‡å®šã—ãŸç‚¹ã«æœ€ã‚‚è¿‘ã„æœ‰ç†Bezieræ›²ç·šä¸Šã®ç‚¹ã‚’æ±‚ã‚ã‚‹(é€Ÿåº¦ãŒé…ã„ãŸã‚éæ¨å¥¨)ã€‚
+/// @param [in] bcs ãƒ™ã‚¸ã‚¨æ›²ç·šã®é…åˆ—ã®å…ˆé ­è¦ç´ ã®ãƒã‚¤ãƒ³ã‚¿
+/// @param [in] num_bcs ãƒ™ã‚¸ã‚¨æ›²ç·šã®æ•°
+/// @param [in] tolerance è·é›¢ãƒˆãƒ¬ãƒ©ãƒ³ã‚¹
+/// @param [in] pt_query ã‚¯ã‚¨ãƒªç‚¹
+/// @param [out] bc_nearest æœ€ã‚‚è¿‘ã„ç‚¹ãŒå±ã—ã¦ã„ã‚‹ãƒ™ã‚¸ã‚¨æ›²ç·š
+/// @param [out] t æœ€ã‚‚è¿‘ã„ç‚¹ãŒå±ã—ã¦ã„ã‚‹ãƒ™ã‚¸ã‚¨æ›²ç·šä¸Šã§ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å€¤(å„ãƒ™ã‚¸ã‚¨æ›²ç·šã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ç¯„å›²ã¯0 - 1)
+/// @param [out] pt_nearest æœ€ã‚‚è¿‘ã„ç‚¹ã®ä¸‰æ¬¡å…ƒåº§æ¨™
+/// @return ã‚¯ã‚¨ãƒªç‚¹ã¨æœ€è¿‘ç‚¹ã¨ã®è·é›¢
 ONGEO_DECL double ONGEO_NearestPointBezierCurve_BBClipping(const ON_BezierCurve *bc_begin, const ON_BezierCurve *bc_end, double tolerance, const ON_3dPoint &pt_query, const ON_BezierCurve *&bc_nearest, double &t, ON_3dPoint &pt_nearest);
 
-/// ”¼’¼ü(ON_3dRay)‚Æ—L—Bezier‹È–Ê‚Æ‚ÌŒğ“_‚ğ‹‚ß‚éB
-/// @param [in] ray ”¼’¼ü
-/// @param [in] bez ƒxƒWƒG‹È–Ê
-/// @param [out] tuvints Œğ“_‚Ì”¼’¼ü‘¤‚Ìƒpƒ‰ƒ[ƒ^A‹È–Ê‘¤‚Ìu,vƒpƒ‰ƒ[ƒ^‚Ì3‚Â‚Ì’l‚Å\¬‚³‚ê‚éƒxƒNƒgƒ‹‚Ì”z—ñ
-/// @param [out] ptsrfs Œğ“_‚Ì‹È–Ê‘¤‚ÌOŸŒ³À•W‚Ì”z—ñ
-/// @param [out] ptlins Œğ“_‚Ì”¼’¼ü‘¤‚ÌOŸŒ³À•W‚Ì”z—ñ
-/// @param [in] tolerance “¯ˆêŒğ“_”»’èƒgƒŒƒ‰ƒ“ƒX
-/// @return 0:¬Œ÷A‚»‚êˆÈŠO:¸”s
+/// åŠç›´ç·š(ON_3dRay)ã¨æœ‰ç†Bezieræ›²é¢ã¨ã®äº¤ç‚¹ã‚’æ±‚ã‚ã‚‹ã€‚
+/// @param [in] ray åŠç›´ç·š
+/// @param [in] bez ãƒ™ã‚¸ã‚¨æ›²é¢
+/// @param [out] tuvints äº¤ç‚¹ã®åŠç›´ç·šå´ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã€æ›²é¢å´ã®u,vãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®3ã¤ã®å€¤ã§æ§‹æˆã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã®é…åˆ—
+/// @param [out] ptsrfs äº¤ç‚¹ã®æ›²é¢å´ã®ä¸‰æ¬¡å…ƒåº§æ¨™ã®é…åˆ—
+/// @param [out] ptlins äº¤ç‚¹ã®åŠç›´ç·šå´ã®ä¸‰æ¬¡å…ƒåº§æ¨™ã®é…åˆ—
+/// @param [in] tolerance åŒä¸€äº¤ç‚¹åˆ¤å®šãƒˆãƒ¬ãƒ©ãƒ³ã‚¹
+/// @return 0:æˆåŠŸã€ãã‚Œä»¥å¤–:å¤±æ•—
 ONGEO_DECL int ONGEO_IntersectRayBezier_QuasiInterpolating(const ON_3dRay &ray, const ON_BezierSurface &bez, ON_3dPointArray &tuvints, ON_3dPointArray &ptsrfs, ON_3dPointArray &ptlins, double tolerance);
 
 ONGEO_DECL void ONGEO_CalculateMinMaxWeight(const ON_BezierSurface &src, double &wmin, double &wmax);
 
-/// ƒxƒWƒG‹È–Ê‚ğ•ï‚Ş‘å‚Ü‚©‚ÈBoundingSphere‚ğ¶¬‚·‚éB
+/// ãƒ™ã‚¸ã‚¨æ›²é¢ã‚’åŒ…ã‚€å¤§ã¾ã‹ãªBoundingSphereã‚’ç”Ÿæˆã™ã‚‹ã€‚
 ONGEO_DECL int ONGEO_CalculateRoughBoundingSphere(const ON_BezierSurface &src, ON_3dPoint &center, double &radius);
 
-/// ƒJƒ‹ƒ_ƒm‚ÌŒö®‚Å3x3s—ñ‚ÌŒÅ—L’l‚ğ‹‚ß‚éB
-/// @param [in] A 3x3‚Ìs—ñ
-/// @param [out] l 3‚Â‚ÌŒÅ—L’l (l[0] : 1‚Â–Ú‚Ì‰ğ‚ÌÀ”•” l[1] : 1‚Â–Ú‚Ì‰ğ‚Ì‹•”•”A l[2] : 2‚Â–Ú‚Ì‰ğ‚ÌÀ”•”A ...)
-/// @return true : ŒvZ¬Œ÷, false : ¸”s
+/// ã‚«ãƒ«ãƒ€ãƒã®å…¬å¼ã§3x3è¡Œåˆ—ã®å›ºæœ‰å€¤ã‚’æ±‚ã‚ã‚‹ã€‚
+/// @param [in] A 3x3ã®è¡Œåˆ—
+/// @param [out] l 3ã¤ã®å›ºæœ‰å€¤ (l[0] : 1ã¤ç›®ã®è§£ã®å®Ÿæ•°éƒ¨ l[1] : 1ã¤ç›®ã®è§£ã®è™šæ•°éƒ¨ã€ l[2] : 2ã¤ç›®ã®è§£ã®å®Ÿæ•°éƒ¨ã€ ...)
+/// @return true : è¨ˆç®—æˆåŠŸ, false : å¤±æ•—
 ONGEO_DECL bool ONGEO_EigenValue3_Cardano(double *A[], double l[6]);
 
-/// 3x3s—ñ‚ÆŒÅ—L’l‚©‚çAŒÅ—L’l‚É‘Î‰‚µ‚½ŒÅ—LƒxƒNƒgƒ‹‚ğ‹‚ß‚éBŒÅ—L’l‚ª•¡‘f”‚Ìê‡‚Í”ñ‘Î‰
-/// @param [in] A 3x3‚Ìs—ñ
-/// @param [in] l ŒÅ—L’l (À”)
-/// @param [out] ŒÅ—LƒxƒNƒgƒ‹ (x, y, z‚¢‚¸‚ê‚©‚Ì¬•ª‚ª1‚Æ‚È‚Á‚Ä‚¢‚éB•K—v‚É‰‚¶‚Ä’PˆÊ‰»‚·‚é‚±‚Æ)
-/// @return true : ŒvZ¬Œ÷, false : ¸”s
+/// 3x3è¡Œåˆ—ã¨å›ºæœ‰å€¤ã‹ã‚‰ã€å›ºæœ‰å€¤ã«å¯¾å¿œã—ãŸå›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹ã€‚å›ºæœ‰å€¤ãŒè¤‡ç´ æ•°ã®å ´åˆã¯éå¯¾å¿œ
+/// @param [in] A 3x3ã®è¡Œåˆ—
+/// @param [in] l å›ºæœ‰å€¤ (å®Ÿæ•°)
+/// @param [out] å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ« (x, y, zã„ãšã‚Œã‹ã®æˆåˆ†ãŒ1ã¨ãªã£ã¦ã„ã‚‹ã€‚å¿…è¦ã«å¿œã˜ã¦å˜ä½åŒ–ã™ã‚‹ã“ã¨)
+/// @return true : è¨ˆç®—æˆåŠŸ, false : å¤±æ•—
 ONGEO_DECL bool ONGEO_EigenVector3(double *A[], double l, double v[3]);
 
-// 3ŸŒ³ƒxƒNƒgƒ‹”z—ñ‚©‚ç3x3‚Ì•ªU‹¤•ªUs—ñA‚Ü‚½‚Í‘ŠŠÖŒW”s—ñ‚ğ‹‚ß‚éB
-// @param vecs [in] ƒxƒNƒgƒ‹”z—ñ
-// @param num_vecs [in] ƒxƒNƒgƒ‹‚Ì”
-// @param calc_corr_coef_matrix [in] false:•ªU‹¤•ªU‚ğ‹‚ß‚é true:‘ŠŠÖŒW”s—ñ‚ğ‹‚ß‚éB
-// @param A [out] 3x3‚Ìs—ñ —Ìˆæ‚ÍŒÄ‚Ño‚µŒ³‚ÅŠm•Û‚·‚é‚±‚ÆB
-// @param meanvec [out] ”ñNULL‚Ì‚Æ‚«A•½‹ÏƒxƒNƒgƒ‹‚ğ•Ô‚·B
+// 3æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«é…åˆ—ã‹ã‚‰3x3ã®åˆ†æ•£å…±åˆ†æ•£è¡Œåˆ—ã€ã¾ãŸã¯ç›¸é–¢ä¿‚æ•°è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ã€‚
+// @param vecs [in] ãƒ™ã‚¯ãƒˆãƒ«é…åˆ—
+// @param num_vecs [in] ãƒ™ã‚¯ãƒˆãƒ«ã®æ•°
+// @param calc_corr_coef_matrix [in] false:åˆ†æ•£å…±åˆ†æ•£ã‚’æ±‚ã‚ã‚‹ true:ç›¸é–¢ä¿‚æ•°è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ã€‚
+// @param A [out] 3x3ã®è¡Œåˆ— é ˜åŸŸã¯å‘¼ã³å‡ºã—å…ƒã§ç¢ºä¿ã™ã‚‹ã“ã¨ã€‚
+// @param meanvec [out] éNULLã®ã¨ãã€å¹³å‡ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã™ã€‚
 ONGEO_DECL void ONGEO_Create_Covariance_Matrix3x3(double *vecs, int num_vecs, bool calc_corr_coef_matrix, double *A[3], double *meanvec = 0);
 
-// 3x3‚Ì•ªU‹¤•ªUs—ñ‚©‚ç‘ŠŠÖŒW”s—ñ‚ğ‹‚ß‚éB
-// @param A [in] 3x3‚Ì•ªU‹¤•ªUs—ñ
-// @param B [out] 3x3‚Ì‘ŠŠÖŒW”s—ñ
+// 3x3ã®åˆ†æ•£å…±åˆ†æ•£è¡Œåˆ—ã‹ã‚‰ç›¸é–¢ä¿‚æ•°è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ã€‚
+// @param A [in] 3x3ã®åˆ†æ•£å…±åˆ†æ•£è¡Œåˆ—
+// @param B [out] 3x3ã®ç›¸é–¢ä¿‚æ•°è¡Œåˆ—
 ONGEO_DECL void ONGEO_Covariance2CorrCoef_Matrix3x3(double *A[3], double *B[3]);
 
-/// uA‚Ü‚½‚Ív‚Å•ªŠ„‚ğŒJ‚è•Ô‚µA‚»‚ê‚¼‚ê‚Ì•ªŠ„‚³‚ê‚½‹È–Êƒpƒbƒ`‚ğƒm[ƒh‚É‚µ‚½Sphere2•ª–Ø
-/// Šeƒm[ƒh‚É‚Í’†S“_‚Æ”¼ŒaA•ªŠ„•ûŒü‚ªŠi”[‚³‚ê‚éB
+/// uã€ã¾ãŸã¯vã§åˆ†å‰²ã‚’ç¹°ã‚Šè¿”ã—ã€ãã‚Œãã‚Œã®åˆ†å‰²ã•ã‚ŒãŸæ›²é¢ãƒ‘ãƒƒãƒã‚’ãƒãƒ¼ãƒ‰ã«ã—ãŸSphere2åˆ†æœ¨
+/// å„ãƒãƒ¼ãƒ‰ã«ã¯ä¸­å¿ƒç‚¹ã¨åŠå¾„ã€åˆ†å‰²æ–¹å‘ãŒæ ¼ç´ã•ã‚Œã‚‹ã€‚
 struct ONGEO_CLASS ONGEO_SphereTree{
 	struct Node{
-		ON_3dPoint center; /// ‹…‚Ì’†“_
-		double radius2;    /// ”¼Œa‚Ì2æ
-		int bez_index;     /// ‰½”Ô–Ú‚ÌƒxƒWƒG‹È–Ê‚© •ªŠ„‘ÎÛ‚ªNurbs‹È–ÊŒQ‚Ìê‡‚Í-2
-		int direction;     /// -3 : ƒGƒ‰[ƒm[ƒhA-2 : Nurbs‹È–ÊŒQ‚Ì•ªŠ„, -1 : •ªŠ„‚È‚µ, 0 : split at u, 1 : split at v
-		int childLeft, childRight; // nodes‚ÌƒCƒ“ƒfƒbƒNƒXB-1‚Ìê‡‚Íq–³‚µ
+		ON_3dPoint center; /// çƒã®ä¸­ç‚¹
+		double radius2;    /// åŠå¾„ã®2ä¹—
+		int bez_index;     /// ä½•ç•ªç›®ã®ãƒ™ã‚¸ã‚¨æ›²é¢ã‹ åˆ†å‰²å¯¾è±¡ãŒNurbsæ›²é¢ç¾¤ã®å ´åˆã¯-2
+		int direction;     /// -3 : ã‚¨ãƒ©ãƒ¼ãƒãƒ¼ãƒ‰ã€-2 : Nurbsæ›²é¢ç¾¤ã®åˆ†å‰², -1 : åˆ†å‰²ãªã—, 0 : split at u, 1 : split at v
+		int childLeft, childRight; // nodesã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚-1ã®å ´åˆã¯å­ç„¡ã—
 	};
 	ON_SimpleArray<int> nurbs_index_to_bez_first_index;
 	int num_root_bezsurfs;
@@ -96,28 +96,28 @@ struct ONGEO_CLASS ONGEO_SphereTree{
 
 	int GetRootNodeIndex() const;
 
-	/// –Ø‚ğ¶¬‚·‚éB •ªŠ„I—¹ğŒ‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Í–Ø‚ğ¶¬‚µ‚È‚¢B
-	/// @param radius [in] ”¼Œa‚ªradiusˆÈ‰º‚É‚È‚é‚Ü‚Å•ªŠ„‚ğŒJ‚è•Ô‚·B0‚Ìê‡‚Í”¼Œa‚ğ•ªŠ„I—¹ğŒ‚Æ‚µ‚È‚¢B
-	/// @param weight_rate [in]  d‚İ‚ÌÅ‘å’l‚ÆÅ¬’l‚Ì”ä(Å‘å’l/Å¬’l)‚ª‚±‚Ì’lˆÈ‰º‚É‚È‚é‚Ü‚Å•ªŠ„‚ğŒJ‚è•Ô‚·B0‚Ìê‡‚Í•ªŠ„I—¹ğŒ‚Æ‚µ‚È‚¢B
-	/// @param level [in] Å‘å•ªŠ„ƒŒƒxƒ‹ -1‚Ìê‡‚Í•ªŠ„I—¹ğŒ‚Æ‚µ‚È‚¢B
-	/// @return 0:¬Œ÷A‚»‚êˆÈŠO:¸”s
+	/// æœ¨ã‚’ç”Ÿæˆã™ã‚‹ã€‚ åˆ†å‰²çµ‚äº†æ¡ä»¶ãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆã¯æœ¨ã‚’ç”Ÿæˆã—ãªã„ã€‚
+	/// @param radius [in] åŠå¾„ãŒradiusä»¥ä¸‹ã«ãªã‚‹ã¾ã§åˆ†å‰²ã‚’ç¹°ã‚Šè¿”ã™ã€‚0ã®å ´åˆã¯åŠå¾„ã‚’åˆ†å‰²çµ‚äº†æ¡ä»¶ã¨ã—ãªã„ã€‚
+	/// @param weight_rate [in]  é‡ã¿ã®æœ€å¤§å€¤ã¨æœ€å°å€¤ã®æ¯”(æœ€å¤§å€¤/æœ€å°å€¤)ãŒã“ã®å€¤ä»¥ä¸‹ã«ãªã‚‹ã¾ã§åˆ†å‰²ã‚’ç¹°ã‚Šè¿”ã™ã€‚0ã®å ´åˆã¯åˆ†å‰²çµ‚äº†æ¡ä»¶ã¨ã—ãªã„ã€‚
+	/// @param level [in] æœ€å¤§åˆ†å‰²ãƒ¬ãƒ™ãƒ« -1ã®å ´åˆã¯åˆ†å‰²çµ‚äº†æ¡ä»¶ã¨ã—ãªã„ã€‚
+	/// @return 0:æˆåŠŸã€ãã‚Œä»¥å¤–:å¤±æ•—
 	int CreateTree(double radius2, double weight_rate, int level);
 
-	/// ƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚çA(ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Å—^‚¦‚½)Œ³‚Æ‚È‚éNurbs‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚·‚éB 
-	/// @param bez_index [in] ƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX
-	/// @return Nurbs‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX
+	/// ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰ã€(ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§ä¸ãˆãŸ)å…ƒã¨ãªã‚‹Nurbsæ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚ 
+	/// @param bez_index [in] ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	/// @return Nurbsæ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 	int GetNurbsIndexFromBezIndex(int bez_index) const;
 
-	/// ƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚çA“¯ˆêNurbs‹È–Ê‚©‚ç•ªŠ„‚³‚ê‚½–Ê‚Ì‚¤‚¿Aæ“ª‚ÌƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX‚ğæ“¾‚·‚éB 
-	/// @param bez_index [in] ƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX
-	/// @return “¯ˆêNurbs‹È–Ê‚©‚ç•ªŠ„‚³‚ê‚½–Ê‚Ì’†‚Åæ“ª‚ÌƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX
+	/// ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰ã€åŒä¸€Nurbsæ›²é¢ã‹ã‚‰åˆ†å‰²ã•ã‚ŒãŸé¢ã®ã†ã¡ã€å…ˆé ­ã®ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’å–å¾—ã™ã‚‹ã€‚ 
+	/// @param bez_index [in] ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	/// @return åŒä¸€Nurbsæ›²é¢ã‹ã‚‰åˆ†å‰²ã•ã‚ŒãŸé¢ã®ä¸­ã§å…ˆé ­ã®ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 	int GetFirstBezIndexFromBezIndex(int bez_index) const;
 
-	/// Nurbs‹È–ÊŒQ‚ÆƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚çA‚»‚ÌƒxƒWƒG‹È–Ê‚É‘Î‰‚·‚éNurbs‹È–Êã‚Ìƒpƒ‰ƒ[ƒ^”ÍˆÍ‚ğ‹‚ß‚éB 
-	/// @param nbsurf [in] Nurbs‹È–Ê‚Ì”z—ñ‚Ìƒ|ƒCƒ“ƒ^BƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Å—^‚¦‚½‚à‚Ì‚Æ“¯ˆê‚Å‚ ‚é‚±‚Æ
-	/// @param bez_index [in] ƒxƒWƒG‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX
-	/// @param range [out] ƒpƒ‰ƒ[ƒ^”ÍˆÍ [0] : u•ûŒüA [1] : v•ûŒü
-	/// @return bez_index‚ª‘®‚·‚éNurbs‹È–Ê‚ÌƒCƒ“ƒfƒbƒNƒX
+	/// Nurbsæ›²é¢ç¾¤ã¨ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰ã€ãã®ãƒ™ã‚¸ã‚¨æ›²é¢ã«å¯¾å¿œã™ã‚‹Nurbsæ›²é¢ä¸Šã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¯„å›²ã‚’æ±‚ã‚ã‚‹ã€‚ 
+	/// @param nbsurf [in] Nurbsæ›²é¢ã®é…åˆ—ã®ãƒã‚¤ãƒ³ã‚¿ã€‚ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§ä¸ãˆãŸã‚‚ã®ã¨åŒä¸€ã§ã‚ã‚‹ã“ã¨
+	/// @param bez_index [in] ãƒ™ã‚¸ã‚¨æ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	/// @param range [out] ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¯„å›² [0] : uæ–¹å‘ã€ [1] : væ–¹å‘
+	/// @return bez_indexãŒå±ã™ã‚‹Nurbsæ›²é¢ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 	int GetNurbsIntervalFromBezIndex(const ON_NurbsSurface *nbsurfs, int bez_index, ON_Interval range[2]) const;
 
 	struct Result{
@@ -125,25 +125,25 @@ struct ONGEO_CLASS ONGEO_SphereTree{
 		int node_index;
 		ON_Interval uint, vint;
 	};
-	/// ray‚Æ–Ø‚ÌŒğ·ƒeƒXƒg‚ğÀ{‚·‚éB—tƒm[ƒh‚ğ’H‚Á‚½Œ‹‰Ê‚ğresults‚É‘‚«o‚·B
-	/// ray‚Ìm_V‚Í’PˆÊ‰»‚³‚ê‚Ä‚¢‚é‚±‚Æ
-	/// ‘ÎÛ‚Ìbezs‚ª‘oˆêŸ‹È–Ê‚Ì‚Æ‚«‚Í–³ğŒ‚Éresults‚É‘‚«o‚·B
+	/// rayã¨æœ¨ã®äº¤å·®ãƒ†ã‚¹ãƒˆã‚’å®Ÿæ–½ã™ã‚‹ã€‚è‘‰ãƒãƒ¼ãƒ‰ã‚’è¾¿ã£ãŸçµæœã‚’resultsã«æ›¸ãå‡ºã™ã€‚
+	/// rayã®m_Vã¯å˜ä½åŒ–ã•ã‚Œã¦ã„ã‚‹ã“ã¨
+	/// å¯¾è±¡ã®bezsãŒåŒä¸€æ¬¡æ›²é¢ã®ã¨ãã¯ç„¡æ¡ä»¶ã«resultsã«æ›¸ãå‡ºã™ã€‚
 	void RayIntersectTest(const ON_3dRay &ray, ON_SimpleArray<Result> &results) const;
 };
 
-// Face‚ª‚ÂLoopŒQ‚ÌUVƒJ[ƒu‚ğƒxƒWƒG‹ÈüŒQ‚É•ª‰ğ‚·‚éB
-// @param [in] face ‘ÎÛ‚ÌFace—v‘f
-// @param [out] loop_crvs Loop‚ÌUVƒJ[ƒuŒQ
-// @param [out] num_crvs_in_a_loop ŠeLoop‚ª‰½ŒÂ‚ÌBezierUVƒJ[ƒu‚ğ‚Á‚Ä‚¢‚é‚©‚ğ¦‚·B num_crvs_in_a_loop[0]‚ªŠO‘¤ƒ‹[ƒv‚ğ\¬‚·‚é‹Èü‚Ì”A[1]ˆÈ~‚ª“à‘¤ƒ‹[ƒv
-//   —á‚¦‚ÎAloop_crvs‚Ì num_crvs_in_a_loop[0]”Ô–Ú`num_crvs_in_a_loop[0]+num_crvs_in_a_loop[1]-1”Ô–Ú‚Ü‚Å‚ªˆê‚Â–Ú‚Ì“à‘¤‚Ìƒ‹[ƒv‚ğ\¬‚·‚éBezier‹Èü‚ğ¦‚·B
+// FaceãŒæŒã¤Loopç¾¤ã®UVã‚«ãƒ¼ãƒ–ã‚’ãƒ™ã‚¸ã‚¨æ›²ç·šç¾¤ã«åˆ†è§£ã™ã‚‹ã€‚
+// @param [in] face å¯¾è±¡ã®Faceè¦ç´ 
+// @param [out] loop_crvs Loopã®UVã‚«ãƒ¼ãƒ–ç¾¤
+// @param [out] num_crvs_in_a_loop å„LoopãŒä½•å€‹ã®BezierUVã‚«ãƒ¼ãƒ–ã‚’æŒã£ã¦ã„ã‚‹ã‹ã‚’ç¤ºã™ã€‚ num_crvs_in_a_loop[0]ãŒå¤–å´ãƒ«ãƒ¼ãƒ—ã‚’æ§‹æˆã™ã‚‹æ›²ç·šã®æ•°ã€[1]ä»¥é™ãŒå†…å´ãƒ«ãƒ¼ãƒ—
+//   ä¾‹ãˆã°ã€loop_crvsã® num_crvs_in_a_loop[0]ç•ªç›®ï½num_crvs_in_a_loop[0]+num_crvs_in_a_loop[1]-1ç•ªç›®ã¾ã§ãŒä¸€ã¤ç›®ã®å†…å´ã®ãƒ«ãƒ¼ãƒ—ã‚’æ§‹æˆã™ã‚‹Bezieræ›²ç·šã‚’ç¤ºã™ã€‚
 ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop);
 
-// UVƒJ[ƒu‚ğ¦‚·ƒxƒWƒG‹ÈüŒQ‚©‚çAuv“_‚Ì“àŠO”»’è‚ğÀ{‚·‚éB
-// @param [in] loop_crvs Loop‚ÌUVƒJ[ƒuŒQ
-// @param [in] num_crvs_in_a_loop ŠeLoop‚ª‰½ŒÂ‚ÌBezierUVƒJ[ƒu‚ğ‚Á‚Ä‚¢‚é‚©
-// @param [in] uv uv“_
-// @param [in] tolerance uv‹óŠÔ“à‚Å‚ÌˆÊ’uƒgƒŒƒ‰ƒ“ƒX
-// @return true:uv“_‚Íƒ‹[ƒv‚Ì’†Afalse:uv“_‚Íƒ‹[ƒv‚ÌŠO
+// UVã‚«ãƒ¼ãƒ–ã‚’ç¤ºã™ãƒ™ã‚¸ã‚¨æ›²ç·šç¾¤ã‹ã‚‰ã€uvç‚¹ã®å†…å¤–åˆ¤å®šã‚’å®Ÿæ–½ã™ã‚‹ã€‚
+// @param [in] loop_crvs Loopã®UVã‚«ãƒ¼ãƒ–ç¾¤
+// @param [in] num_crvs_in_a_loop å„LoopãŒä½•å€‹ã®BezierUVã‚«ãƒ¼ãƒ–ã‚’æŒã£ã¦ã„ã‚‹ã‹
+// @param [in] uv uvç‚¹
+// @param [in] tolerance uvç©ºé–“å†…ã§ã®ä½ç½®ãƒˆãƒ¬ãƒ©ãƒ³ã‚¹
+// @return true:uvç‚¹ã¯ãƒ«ãƒ¼ãƒ—ã®ä¸­ã€false:uvç‚¹ã¯ãƒ«ãƒ¼ãƒ—ã®å¤–
 ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance);
 
 ONGEO_DECL ONGEO_SphereTree *ONGEO_NewSphereTree(int num, const ON_NurbsSurface *nbsurfs);
@@ -155,85 +155,85 @@ ONGEO_DECL int ONGEO_SphereTree_GetNurbsIndexFromBezIndex(const ONGEO_SphereTree
 ONGEO_DECL int ONGEO_SphereTree_GetFirstBezIndexFromBezIndex(const ONGEO_SphereTree *, int bez_index);
 ONGEO_DECL int ONGEO_SphereTree_GetNurbsIntervalFromBezIndex(const ONGEO_SphereTree *, const ON_NurbsSurface *nbsurfs, int bez_index, ON_Interval range[2]);
 
-// ‘½€®ŠÖ”‚É’l‚ğ‘ã“ü‚µ‚ÄŒvZ‚·‚éB
-// @param [in] t ‘ã“ü‚·‚é’l
-// @param [in] coef ‘½€®‚ÌŒW”—ñ
-// @param [in] num ŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @return ŒvZŒ‹‰Ê
+// å¤šé …å¼é–¢æ•°ã«å€¤ã‚’ä»£å…¥ã—ã¦è¨ˆç®—ã™ã‚‹ã€‚
+// @param [in] t ä»£å…¥ã™ã‚‹å€¤
+// @param [in] coef å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @return è¨ˆç®—çµæœ
 ONGEO_DECL double ONGEO_Polynomial_Evaluate(double t, const double *coef, int num);
 
-// 2‚Â‚Ì‘½€®‚Ì˜a‚ğ‹‚ß‚éB
-// @param [in] coef1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num1 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef1‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [in] coef2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num2 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef2‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_add ‘½€®1 + ‘½€®2‚ğ¦‚·‘½€®‚ÌŒW”—ñ
-// @param [in] num o—Í‘½€®‚ÌŒW”‚ÌŒÂ” (num1 <= num ‚©‚Â num2 <= num‚Å‚ ‚é‚±‚Æ  coef1 ‚Ü‚½‚Í coef2‚Æ“¯‚¶êŠ‚ğw‚µ‚Ä‚¢‚Ä‚à“KØ‚ÉŒvZ‰Â”\)
-// @return true:¬Œ÷A false:¸”s
+// 2ã¤ã®å¤šé …å¼ã®å’Œã‚’æ±‚ã‚ã‚‹ã€‚
+// @param [in] coef1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num1 == 0 ã®ã¨ãã«é™ã‚Šã€coef1ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [in] coef2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num2 == 0 ã®ã¨ãã«é™ã‚Šã€coef2ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_add å¤šé …å¼1 + å¤šé …å¼2ã‚’ç¤ºã™å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num å‡ºåŠ›å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•° (num1 <= num ã‹ã¤ num2 <= numã§ã‚ã‚‹ã“ã¨  coef1 ã¾ãŸã¯ coef2ã¨åŒã˜å ´æ‰€ã‚’æŒ‡ã—ã¦ã„ã¦ã‚‚é©åˆ‡ã«è¨ˆç®—å¯èƒ½)
+// @return true:æˆåŠŸã€ false:å¤±æ•—
 ONGEO_DECL bool ONGEO_Polynomial_Add(const double *coef1, int num1, const double *coef2, int num2, double *coef_add, int num_add);
 
-// 2‚Â‚Ì‘½€®‚Ì·‚ğ‹‚ß‚éB
-// @param [in] coef1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num1 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef1‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [in] coef2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ num2 == 0 ‚Ì‚Æ‚«‚ÉŒÀ‚èAcoef2‚Íƒkƒ‹ƒ|ƒCƒ“ƒ^‚Å‚à‰Â
-// @param [in] num2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_sub ‘½€®1 - ‘½€®2‚ğ¦‚·‘½€®‚ÌŒW”—ñ
-// @param [in] num o—Í‘½€®‚ÌŒW”‚ÌŒÂ” (num1 <= num ‚©‚Â num2 <= num‚Å‚ ‚é‚±‚Æ  coef1 ‚Ü‚½‚Í coef2‚Æ“¯‚¶êŠ‚ğw‚µ‚Ä‚¢‚Ä‚à“KØ‚ÉŒvZ‰Â”\)
-// @return true:¬Œ÷A false:¸”s
+// 2ã¤ã®å¤šé …å¼ã®å·®ã‚’æ±‚ã‚ã‚‹ã€‚
+// @param [in] coef1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num1 == 0 ã®ã¨ãã«é™ã‚Šã€coef1ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [in] coef2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ— num2 == 0 ã®ã¨ãã«é™ã‚Šã€coef2ã¯ãƒŒãƒ«ãƒã‚¤ãƒ³ã‚¿ã§ã‚‚å¯
+// @param [in] num2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_sub å¤šé …å¼1 - å¤šé …å¼2ã‚’ç¤ºã™å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num å‡ºåŠ›å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•° (num1 <= num ã‹ã¤ num2 <= numã§ã‚ã‚‹ã“ã¨  coef1 ã¾ãŸã¯ coef2ã¨åŒã˜å ´æ‰€ã‚’æŒ‡ã—ã¦ã„ã¦ã‚‚é©åˆ‡ã«è¨ˆç®—å¯èƒ½)
+// @return true:æˆåŠŸã€ false:å¤±æ•—
 ONGEO_DECL bool ONGEO_Polynomial_Subtract(const double *coef1, int num1, const double *coef2, int num2, double *coef_sub, int num_sub);
 
-	// 2‚Â‚Ì‘½€®‚ÌÏ‚ğ‘½€®‚Æ‚µ‚Ä“WŠJ‚·‚éB
-// @param [in] coef1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ
-// @param [in] num1 1‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [in] coef2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”—ñ
-// @param [in] num2 2‚Â‚ß‚Ì‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_mul 2‚Â‚Ì‘½€®‚ÌÏ‚ğ“WŠJ‚µ‚½‘½€®‚ÌŒW”—ñ
-//	([num1+num2-2]Ÿ‚Ì‘½€®‚Æ‚È‚é‚½‚ßA“ü—Í‘¤‚Ånum1+num2-1ŒÂ•ª‚ÌŒW”‚Ì—Ìˆæ‚ğŠm•Û‚·‚é•K—v‚ª‚ ‚éB)
+	// 2ã¤ã®å¤šé …å¼ã®ç©ã‚’å¤šé …å¼ã¨ã—ã¦å±•é–‹ã™ã‚‹ã€‚
+// @param [in] coef1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num1 1ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [in] coef2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num2 2ã¤ã‚ã®å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_mul 2ã¤ã®å¤šé …å¼ã®ç©ã‚’å±•é–‹ã—ãŸå¤šé …å¼ã®ä¿‚æ•°åˆ—
+//	([num1+num2-2]æ¬¡ã®å¤šé …å¼ã¨ãªã‚‹ãŸã‚ã€å…¥åŠ›å´ã§num1+num2-1å€‹åˆ†ã®ä¿‚æ•°ã®é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚)
 ONGEO_DECL void ONGEO_Polynomial_Multiply(const double *coef1, int num1, const double *coef2, int num2, double *coef_mul);
 
-// ‘½€®‚ğˆêŠK”÷•ª‚·‚éB
-// @param [in] coef ‘½€®‚ÌŒW”—ñ
-// @param [in] num ‘½€®‚ÌŒW”‚ÌŒÂ”(=Ÿ”+1)
-// @param [out] coef_dif ”÷•ª‚µ‚½‘½€®‚ÌŒW”—ñ
-//    (ŒÄ‚Ño‚µŒ³‚Ånum-1ŒÂ•ª‚Ì—Ìˆæ‚ğŠm•Û‚·‚é‚±‚Æ
-//     coef‚Æ“¯‚¶êŠ‚ÉŒ‹‰Ê‚ğã‘‚«‚µ‚½‚¢ê‡‚ÍA‚±‚Ìˆø”‚Æ‚µ‚Ä&coef[1]‚ğ“n‚µA–{ŠÖ”ŒÄo‚µŒã‚Écoef[0] = 0.0‚Æ‚·‚é‚±‚Æ)
+// å¤šé …å¼ã‚’ä¸€éšå¾®åˆ†ã™ã‚‹ã€‚
+// @param [in] coef å¤šé …å¼ã®ä¿‚æ•°åˆ—
+// @param [in] num å¤šé …å¼ã®ä¿‚æ•°ã®å€‹æ•°(=æ¬¡æ•°+1)
+// @param [out] coef_dif å¾®åˆ†ã—ãŸå¤šé …å¼ã®ä¿‚æ•°åˆ—
+//    (å‘¼ã³å‡ºã—å…ƒã§num-1å€‹åˆ†ã®é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹ã“ã¨
+//     coefã¨åŒã˜å ´æ‰€ã«çµæœã‚’ä¸Šæ›¸ãã—ãŸã„å ´åˆã¯ã€ã“ã®å¼•æ•°ã¨ã—ã¦&coef[1]ã‚’æ¸¡ã—ã€æœ¬é–¢æ•°å‘¼å‡ºã—å¾Œã«coef[0] = 0.0ã¨ã™ã‚‹ã“ã¨)
 ONGEO_DECL void ONGEO_Polynomial_Differential(const double *coef, int num, double *coef_dif);
 
-// ‘½€®‚ÌŒW”—ñ‚©‚çSturm—ñ‚ğ¶¬‚·‚éB
-// @param coef [in] ‘½€®‚ÌŒW”—ñ (Ÿ”‚Ì‘å‚«‚¢‡)
-// @param num [in] ‘½€®‚ÌŒW”‚Ì”
-// @param s [out] Sturm—ñ (ŒÄ‚Ño‚µŒ³‚Ånf*nfŒÂ•ª‚Ì—Ìˆæ‚ğŠm•Û‚·‚é‚±‚Æ)
+// å¤šé …å¼ã®ä¿‚æ•°åˆ—ã‹ã‚‰Sturmåˆ—ã‚’ç”Ÿæˆã™ã‚‹ã€‚
+// @param coef [in] å¤šé …å¼ã®ä¿‚æ•°åˆ— (æ¬¡æ•°ã®å¤§ãã„é †)
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•°
+// @param s [out] Sturmåˆ— (å‘¼ã³å‡ºã—å…ƒã§nf*nfå€‹åˆ†ã®é ˜åŸŸã‚’ç¢ºä¿ã™ã‚‹ã“ã¨)
 ONGEO_DECL void ONGEO_Polynomial_CreateSturmSequence(const double *coef, int num, double *strum);
 
-// Sturm—ñ‚ğ—p‚¢‚ÄAw’è‚µ‚½’l‚Å‚Ì•„†”½“]‰ñ”‚ğŒvZ‚·‚éB
-// @param t [in] ’l
-// @param sturm [in] Sturm—ñ
-// @param num [in] ‘½€®‚ÌŒW”‚Ì” (Sturm—ñ‚Ì”z—ñ’·‚Ínum*num)
-// @return •„†”½“]‰ñ”
+// Sturmåˆ—ã‚’ç”¨ã„ã¦ã€æŒ‡å®šã—ãŸå€¤ã§ã®ç¬¦å·åè»¢å›æ•°ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+// @param t [in] å€¤
+// @param sturm [in] Sturmåˆ—
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•° (Sturmåˆ—ã®é…åˆ—é•·ã¯num*num)
+// @return ç¬¦å·åè»¢å›æ•°
 ONGEO_DECL int ONGEO_Polynomial_NumberOfSignChangesOfSturmSequence(double t, const double *strum, int num);
 
-// Sturm—ñ‚ğ—p‚¢‚ÄAw’è‚µ‚½‹æŠÔ“à‚Ì‘½€®‚Ìª‚Ì”‚ğŒvZ‚·‚éB
-// @param t1 [in] ‹æŠÔ‚Ì‰ºŒÀ
-// @param t2 [in] ‹æŠÔ‚ÌãŒÀ(t1 < t2 ‚Å‚ ‚é‚±‚Æ)
-// @param sturm [in] Sturm—ñ
-// @param num [in] ‘½€®‚ÌŒW”‚Ì” (Sturm—ñ‚Ì”z—ñ’·‚Ínum*num)
-// @return ‰ğ‚ÌŒÂ”(ƒGƒ‰[‚Ìê‡A•‰”)
+// Sturmåˆ—ã‚’ç”¨ã„ã¦ã€æŒ‡å®šã—ãŸåŒºé–“å†…ã®å¤šé …å¼ã®æ ¹ã®æ•°ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+// @param t1 [in] åŒºé–“ã®ä¸‹é™
+// @param t2 [in] åŒºé–“ã®ä¸Šé™(t1 < t2 ã§ã‚ã‚‹ã“ã¨)
+// @param sturm [in] Sturmåˆ—
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•° (Sturmåˆ—ã®é…åˆ—é•·ã¯num*num)
+// @return è§£ã®å€‹æ•°(ã‚¨ãƒ©ãƒ¼ã®å ´åˆã€è² æ•°)
 ONGEO_DECL int ONGEO_Polynomial_CalculateNumRoot(double t1, double t2, const double *strum, int num);
 
-// ƒpƒXƒJƒ‹‚ÌOŠpŒ`‚Ìdim+1s–Ú‚ğŒvZ‚µAŠÖ”‘¤‚Å—pˆÓ‚µ‚½”z—ñ‚ğ•Ô‚·B
-// @param dim [in] ŒvZ‘ÎÛ‚ÌŸ”
-// @return ƒpƒXƒJƒ‹‚ÌOŠpŒ`‚Ìdim+1s–Ú ’·‚³ dim+1‚Ì”z—ñ‚ğ•Ô‚·B”z—ñ‚ÍŠÖ”‚ªŠÇ—‚·‚é‚½‚ßAdelete[]“™‚Å‰ğ•ú‚µ‚Ä‚Í‚È‚ç‚È‚¢B
+// ãƒ‘ã‚¹ã‚«ãƒ«ã®ä¸‰è§’å½¢ã®dim+1è¡Œç›®ã‚’è¨ˆç®—ã—ã€é–¢æ•°å´ã§ç”¨æ„ã—ãŸé…åˆ—ã‚’è¿”ã™ã€‚
+// @param dim [in] è¨ˆç®—å¯¾è±¡ã®æ¬¡æ•°
+// @return ãƒ‘ã‚¹ã‚«ãƒ«ã®ä¸‰è§’å½¢ã®dim+1è¡Œç›® é•·ã• dim+1ã®é…åˆ—ã‚’è¿”ã™ã€‚é…åˆ—ã¯é–¢æ•°ãŒç®¡ç†ã™ã‚‹ãŸã‚ã€delete[]ç­‰ã§è§£æ”¾ã—ã¦ã¯ãªã‚‰ãªã„ã€‚
 ONGEO_DECL int *ONGEO_Polynomial_CalcPascalTriangle(int dim);
 
-// ƒpƒXƒJƒ‹‚ÌOŠpŒ`‚ğg—p‚µ‚Ä“ñ€ŒW” mCn ‚ğŒvZ‚·‚éB
-// @param m, n [in] ŒW”
-// @return “ñ€ŒW”
+// ãƒ‘ã‚¹ã‚«ãƒ«ã®ä¸‰è§’å½¢ã‚’ä½¿ç”¨ã—ã¦äºŒé …ä¿‚æ•° mCn ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+// @param m, n [in] ä¿‚æ•°
+// @return äºŒé …ä¿‚æ•°
 ONGEO_DECL int ONGEO_Polynomial_CalcBinomialCoef(int m, int n);
 
-// Brent–@‚ğ—p‚¢‚Äª‚ğ‹‚ß‚éB‹æŠÔ ti1 - ti2 ‚Ì’†‚Å’P’²‘‰ÁA‚Ü‚½‚Í’P’²Œ¸­‚Å‚ ‚é‚±‚ÆB
-// @param ti1 [in] ‹·‚ß‚½‚¢‹æŠÔ‚Ì‰ºŒÀ
-// @param ti2 [in] ‹·‚ß‚½‚¢‹æŠÔ‚ÌãŒÀ ti1 < ti2‚Å‚ ‚é‚±‚ÆB
-// @param coef [in] ‘½€®‚ÌŒW”
-// @param num [in] ‘½€®‚ÌŒW”‚Ì”
-// @return ª‚Æ‚È‚é’l
+// Brentæ³•ã‚’ç”¨ã„ã¦æ ¹ã‚’æ±‚ã‚ã‚‹ã€‚åŒºé–“ ti1 - ti2 ã®ä¸­ã§å˜èª¿å¢—åŠ ã€ã¾ãŸã¯å˜èª¿æ¸›å°‘ã§ã‚ã‚‹ã“ã¨ã€‚
+// @param ti1 [in] ç‹­ã‚ãŸã„åŒºé–“ã®ä¸‹é™
+// @param ti2 [in] ç‹­ã‚ãŸã„åŒºé–“ã®ä¸Šé™ ti1 < ti2ã§ã‚ã‚‹ã“ã¨ã€‚
+// @param coef [in] å¤šé …å¼ã®ä¿‚æ•°
+// @param num [in] å¤šé …å¼ã®ä¿‚æ•°ã®æ•°
+// @return æ ¹ã¨ãªã‚‹å€¤
 ONGEO_DECL double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num);

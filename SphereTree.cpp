@@ -1,4 +1,4 @@
-// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+ï»¿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #define NOMINMAX
 #include "ONGEO.h"
@@ -65,15 +65,15 @@ namespace{
 
 			double Abuf[9] = {0};
 			double *A[] = {&Abuf[0], &Abuf[3], &Abuf[6]};
-			// •ªU‹¤•ªUs—ñ‚ğ‹‚ß‚éB
+			// åˆ†æ•£å…±åˆ†æ•£è¡Œåˆ—ã‚’æ±‚ã‚ã‚‹ã€‚
 			ON_3dVector mean = ON_3dVector(0,0,0);
-			// ‚Ü‚¸‚ÍŠe¬•ª‚Ì•½‹Ï
+			// ã¾ãšã¯å„æˆåˆ†ã®å¹³å‡
 			for (int i = range.first; i <= range.second; ++i){
 				mean += nodes[cbuf[i]].center;
 			}
 			double denom = static_cast<double>(range.second - range.first + 1);
 			mean /= denom;
-			// •ªUE‹¤•ªUs—ñì¬
+			// åˆ†æ•£ãƒ»å…±åˆ†æ•£è¡Œåˆ—ä½œæˆ
 			for (int i = range.first; i <= range.second; ++i){
 				ON_3dVector dif = nodes[cbuf[i]].center - mean;
 				A[0][0] += dif.x * dif.x;
@@ -86,7 +86,7 @@ namespace{
 			A[0][0] /= denom, A[0][1] /= denom, A[0][2] /= denom;
 			A[1][1] /= denom, A[1][2] /= denom, A[2][2] /= denom;
 
-			// ‘ŠŠÖs—ñ‚É•ÏŠ·
+			// ç›¸é–¢è¡Œåˆ—ã«å¤‰æ›
 			double s[3] = {std::sqrt(A[0][0]), std::sqrt(A[1][1]), std::sqrt(A[2][2])};
 			A[0][0] = (s[0] < ON_ZERO_TOLERANCE) ? 0.0 : 1.0;
 			A[1][1] = (s[1] < ON_ZERO_TOLERANCE) ? 0.0 : 1.0;
@@ -98,10 +98,10 @@ namespace{
 
 			A[1][0] = A[0][1], A[2][0] = A[0][2], A[2][1] = A[1][2];
 
-			// ŒÅ—L’lAŒÅ—LƒxƒNƒgƒ‹ŒvZ
+			// å›ºæœ‰å€¤ã€å›ºæœ‰ãƒ™ã‚¯ãƒˆãƒ«è¨ˆç®—
 			double l[6];
 			ONGEO_EigenValue3_Cardano(A, l);
-			// â‘Î’l‚ªÅ‚à‘å‚«‚¢ŒÅ—L’l‚ğ’T‚·
+			// çµ¶å¯¾å€¤ãŒæœ€ã‚‚å¤§ãã„å›ºæœ‰å€¤ã‚’æ¢ã™
 			double lmax = l[0];
 			double lamax = std::abs(lmax);
 			for (int i = 2; i < 6; i += 2){
@@ -118,7 +118,7 @@ namespace{
 
 			int g1 = range.first, g2 = range.second;
 
-			// “àÏ‚Ì³•‰‚ÅU‚è•ª‚¯
+			// å†…ç©ã®æ­£è² ã§æŒ¯ã‚Šåˆ†ã‘
 			for (int i = range.first; i <= range.second; ++i){
 				int index = tbuf[i];
 				double t = ON_DotProduct(v, nodes[index].center - node_cur.center);
@@ -242,7 +242,7 @@ int ONGEO_SphereTree::CreateTree(double radius2, double weight_rate, int level){
 			}
 		}
 
-		// u•ûŒü‚Æv•ûŒü‚Ì§Œä“_ŠÔ‚Ì’·‚³‚ğŒvZ
+		// uæ–¹å‘ã¨væ–¹å‘ã®åˆ¶å¾¡ç‚¹é–“ã®é•·ã•ã‚’è¨ˆç®—
 		for (int j = 0, ji = 0; j < bez.Order(1); ++j, ji += bez.Order(0)){
 			for (int i = 0; i < bez.Order(0)-1; ++i){
 				ulen2 += (q[ji+i+1]-q[ji+i]).LengthSquared();
@@ -254,7 +254,7 @@ int ONGEO_SphereTree::CreateTree(double radius2, double weight_rate, int level){
 			}
 		}
 
-		// ulen2‚Ævlen2‚Ì‘å‚«‚¢‚Ù‚¤‚ğ”¼•ª‚É•ªŠ„‚·‚éB
+		// ulen2ã¨vlen2ã®å¤§ãã„ã»ã†ã‚’åŠåˆ†ã«åˆ†å‰²ã™ã‚‹ã€‚
 		StackItem sileft, siright;
 		cnode.direction = (ulen2 > vlen2) ? 0 : 1;
 		bez.Split(cnode.direction, 0.5, sileft.bez, siright.bez);

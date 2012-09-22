@@ -1,4 +1,4 @@
-// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+ï»¿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #define NOMINMAX
 #include "opennurbs.h"
@@ -71,8 +71,8 @@ template <typename T> void EvaluateBiLinearSurf(const ON_3dRay &ray, T cods[4], 
 	ptlin = lin.PointAt(t);
 }
 
-// 0:‰ğ‚ª“¾‚ç‚ê‚½B1:‰ğ‚ª“¾‚ç‚ê‚È‚¢B-1:“ü—Í“_”‚ª4ŒÂ‚Å‚Í‚È‚¢B
-// inrange 0:—¼•û”ÍˆÍŠOA1:[0]‚Ì•û‚ª”ÍˆÍ“àA2:[1]‚Ì•û‚ª”ÍˆÍ“àA3:—¼•û”ÍˆÍ“à
+// 0:è§£ãŒå¾—ã‚‰ã‚ŒãŸã€‚1:è§£ãŒå¾—ã‚‰ã‚Œãªã„ã€‚-1:å…¥åŠ›ç‚¹æ•°ãŒ4å€‹ã§ã¯ãªã„ã€‚
+// inrange 0:ä¸¡æ–¹ç¯„å›²å¤–ã€1:[0]ã®æ–¹ãŒç¯„å›²å†…ã€2:[1]ã®æ–¹ãŒç¯„å›²å†…ã€3:ä¸¡æ–¹ç¯„å›²å†…
 int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v[2], int &inrange, double err2, double tolerance){
 	PROF("IntersectZeroPointBiLinear");
 	const double tole_z2 = ON_ZERO_TOLERANCE * ON_ZERO_TOLERANCE;
@@ -83,7 +83,7 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 	du = p12 - p11, dv = p21 - p11;
 	double dul2 = du.LengthSquared(), dvl2 = dv.LengthSquared();
 
-	// k‘Ş‚µ‚Ä‚¢‚é‚Æ‚«‚Í”½‘Î‘¤‚ğg‚¤
+	// ç¸®é€€ã—ã¦ã„ã‚‹ã¨ãã¯åå¯¾å´ã‚’ä½¿ã†
 	if (dul2 < tole_z2){
 		inv_v = true;
 		ON_2dPoint pw;
@@ -91,7 +91,7 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 		pw = p12, p12 = p22, p22 = pw;
 		du = p12 - p11, dv *= -1;
 		if (dul2 < tole_z2){
-			// –Ê‚ÆZeroPoint‚Ìü‚ª•½s
+			// é¢ã¨ZeroPointã®ç·šãŒå¹³è¡Œ
 			return 1;
 		}
 	}else if (dvl2 < tole_z2){
@@ -101,7 +101,7 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 		pw = p21, p21 = p22, p22 = pw;
 		du *= -1, dv = p21 - p11;
 		if (dvl2 < tole_z2){
-			// –Ê‚ÆZeroPoint‚Ìü‚ª•½s
+			// é¢ã¨ZeroPointã®ç·šãŒå¹³è¡Œ
 			return 1;
 		}
 	}
@@ -111,15 +111,15 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 	double denom_u = 2*(ds[0]*du[1]-ds[1]*du[0]);
 	double denom_v = 2*(ds[0]*dv[1]-ds[1]*dv[0]);
 
-	// •½s‚È•Ó‚ª‘¶İ‚·‚é‚Æ‚«
+	// å¹³è¡Œãªè¾ºãŒå­˜åœ¨ã™ã‚‹ã¨ã
 	bool zero_u = std::abs(denom_u) < tolerance;
 	bool zero_v = std::abs(denom_v) < tolerance;
-	if (zero_u && zero_v) { // •½sl•ÓŒ`A•HŒ`A’·•ûŒ`A³•ûŒ`
+	if (zero_u && zero_v) { // å¹³è¡Œå››è¾ºå½¢ã€è±å½¢ã€é•·æ–¹å½¢ã€æ­£æ–¹å½¢
 		u[0] = (dv[1]*p[0]-dv[0]*p[1])/(du[1]*dv[0]-du[0]*dv[1]);
 		v[0] = (du[0]*p[1]-du[1]*p[0])/(du[1]*dv[0]-du[0]*dv[1]);
 		u[1] = -1, v[1] = -1;
 	}else{
-		// (0,0) = u*v*ds+u*du+v*dv+p ‚ğ u,v‚É‚Â‚¢‚Ä‰ğ‚­‚Æ‰º‹L‚Ì‚æ‚¤‚É‚È‚éB
+		// (0,0) = u*v*ds+u*du+v*dv+p ã‚’ u,vã«ã¤ã„ã¦è§£ãã¨ä¸‹è¨˜ã®ã‚ˆã†ã«ãªã‚‹ã€‚
 		double du1dv0 = du[1]*dv[0], du0dv1 = du[0]*dv[1];
 		double du1dv0_du0dv1 = du1dv0-du0dv1;
 		double ds0p1_ds1p0 = ds[0]*p[1]-ds[1]*p[0];
@@ -131,8 +131,8 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 		double nume_u = -du1dv0_du0dv1-ds0p1_ds1p0;
 		double nume_v = -du1dv0_du0dv1+ds0p1_ds1p0;
 
-		// ‰ğ‚Í2‚Â‚Å‚«‚éBŠÖ”‚ğg‚¤‘¤‚Åu,v‚Æ‚à‚É0-1‚Ì’†‚É“ü‚Á‚Ä‚¢‚é•û‚ğÌ—p‚·‚é‚±‚Æ‚ÅA‘oˆêŸ‹Èü‚Æ’¼ü‚Æ‚ÌŒğ“_‚ğ
-		// ‹‚ß‚é‚±‚Æ‚ª‚Å‚«‚éB
+		// è§£ã¯2ã¤ã§ãã‚‹ã€‚é–¢æ•°ã‚’ä½¿ã†å´ã§u,vã¨ã‚‚ã«0-1ã®ä¸­ã«å…¥ã£ã¦ã„ã‚‹æ–¹ã‚’æ¡ç”¨ã™ã‚‹ã“ã¨ã§ã€åŒä¸€æ¬¡æ›²ç·šã¨ç›´ç·šã¨ã®äº¤ç‚¹ã‚’
+		// æ±‚ã‚ã‚‹ã“ã¨ãŒã§ãã‚‹ã€‚
 
 		if (!zero_u){
 			u[0] = (nume_u + R_2) / denom_u;
@@ -144,7 +144,7 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 			v[1] = -(nume_v - R_2) / denom_v;
 		}
 
-		// denom_u ‚â denom_v ‚ª¬‚³‚·‚¬‚Äœ”‚Ég‚¦‚È‚¢ê‡‚Í‰º‹L‚ÌŒvZ‚Å‹‚ß‚éB
+		// denom_u ã‚„ denom_v ãŒå°ã•ã™ãã¦é™¤æ•°ã«ä½¿ãˆãªã„å ´åˆã¯ä¸‹è¨˜ã®è¨ˆç®—ã§æ±‚ã‚ã‚‹ã€‚
 		if (zero_v) {
 			for (int i = 0; i < 2; ++i){
 				ON_2dPoint denom = ds * u[i] + dv, nume = du * u[i] + p11;
@@ -192,7 +192,7 @@ template <typename T> void GetQuasiInterpControlPoints(const ON_BezierSurface &b
 	ON_SimpleArray<T> work_cp;
     work_cp.SetCapacity(bez.m_order[0] * bez.m_order[1]);
 	work_cp.SetCount(work_cp.Capacity());
-	// U•ûŒü
+	// Uæ–¹å‘
 	ON_SimpleArray<T> work_u(bez.m_order[0]);
 	for (int j = 0, ji = 0; j < bez.m_order[1]; ++j, ji += bez.m_order[0]){
 		for (int i = 0; i < bez.m_order[0]; ++i){
@@ -207,7 +207,7 @@ template <typename T> void GetQuasiInterpControlPoints(const ON_BezierSurface &b
 
     qicp.SetCapacity(work_cp.Count());
 	qicp.SetCount(qicp.Capacity());
-	// V•ûŒü
+	// Væ–¹å‘
 	for (int i = 0; i < bez.m_order[0]; ++i){
 		int j, ji;
 		for (j = 1, ji = bez.m_order[0]; j < bez.m_order[1]-1; ++j, ji += bez.m_order[0]){
@@ -266,7 +266,7 @@ inline void GetCVHomogeneous(const ON_BezierSurface &bez, int i, int j, ON_4dPoi
 
 template <typename T> double GetError(const ON_BezierSurface &bez){
 	PROF("GetError");
-	// U•ûŒü
+	// Uæ–¹å‘
 	double errmax2u = 0;
 	const int ord_u = bez.m_order[0], ord_v = bez.m_order[1];
 	ON_SimpleArray<T> cp(ord_u * ord_v);
@@ -279,7 +279,7 @@ template <typename T> double GetError(const ON_BezierSurface &bez){
 			if (errmax2u < d) errmax2u = d;
 		}
 	}
-	// V•ûŒü
+	// Væ–¹å‘
 	double errmax2v = 0;
 	for (int i = 0; i < ord_u; ++i){
 		for (int j = 1, ji = ord_u; j < ord_v-1; ++j, ji += ord_u){
@@ -292,8 +292,8 @@ template <typename T> double GetError(const ON_BezierSurface &bez){
 }
 }
 
-/// 0  : ü•ª‚ÉÚ‚µ‚Ä‚¢‚È‚­A‚©‚ÂA•Â‚¶‚½—Ìˆæ‚ÌŠO
-/// 1  : ü•ª‚ÉÚ‚µ‚Ä‚¢‚éA‚Ü‚½‚Í•Â‚¶‚½—Ìˆæ‚Ì’†
+/// 0  : ç·šåˆ†ã«æ¥ã—ã¦ã„ãªãã€ã‹ã¤ã€é–‰ã˜ãŸé ˜åŸŸã®å¤–
+/// 1  : ç·šåˆ†ã«æ¥ã—ã¦ã„ã‚‹ã€ã¾ãŸã¯é–‰ã˜ãŸé ˜åŸŸã®ä¸­
 __declspec(dllexport) int IntersectionTest(const ON_2dPointArray &qicp2d, int iu, int iv, int stride, double error2, double *err2_vertices){
 	PROF("IntersectionTest");
 	const int index = iv * stride + iu;
@@ -306,7 +306,7 @@ __declspec(dllexport) int IntersectionTest(const ON_2dPointArray &qicp2d, int iu
 	pts[0] = pts[4];
 	pts[5] = pts[1];
 
-	// 4“_‚ÌBoundingBox‚ğŒvZ‚µA‚»‚Ì‹——£^2‚ªerror2‚æ‚è‚à‘å‚«‚¯‚ê‚Î•Â‚¶‚½—Ìˆæ‚ÌŠO‚Åü•ª‚É‚àÚ‚µ‚Ä‚¢‚È‚¢B
+	// 4ç‚¹ã®BoundingBoxã‚’è¨ˆç®—ã—ã€ãã®è·é›¢^2ãŒerror2ã‚ˆã‚Šã‚‚å¤§ãã‘ã‚Œã°é–‰ã˜ãŸé ˜åŸŸã®å¤–ã§ç·šåˆ†ã«ã‚‚æ¥ã—ã¦ã„ãªã„ã€‚
 	ON_2dPoint bbmin = pts[0], bbmax = pts[0];
 	for (int i = 0; i < 4; ++i){
 		if (bbmin.x > pts[i].x) bbmin.x = pts[i].x;
@@ -315,18 +315,18 @@ __declspec(dllexport) int IntersectionTest(const ON_2dPointArray &qicp2d, int iu
 		else if (bbmax.y < pts[i].y) bbmax.y = pts[i].y;
 	}
 	bool bx = (bbmin.x * bbmax.x < 0), by = (bbmin.y * bbmax.y < 0);
-	if (!bx && !by){ // 4‹÷‚ª‘S‚Ä“¯‚¶ÛŒÀ‚ÉŒÅ‚Ü‚Á‚Ä‚¢‚é
+	if (!bx && !by){ // 4éš…ãŒå…¨ã¦åŒã˜è±¡é™ã«å›ºã¾ã£ã¦ã„ã‚‹
 		ON_2dPoint ptnear = bbmin;
 		if (std::abs(ptnear.x) > std::abs(bbmax.x)) ptnear.x = bbmax.x;
 		if (std::abs(ptnear.y) > std::abs(bbmax.y)) ptnear.y = bbmax.y;
 		if (error2 < ptnear.x * ptnear.x + ptnear.y * ptnear.y) return 0;
-	}else if (!bx){  // 1,4ÛŒÀA‚Ü‚½‚Í2,3ÛŒÀ‚É‚Ü‚½‚ª‚Á‚Ä‚¢‚é
+	}else if (!bx){  // 1,4è±¡é™ã€ã¾ãŸã¯2,3è±¡é™ã«ã¾ãŸãŒã£ã¦ã„ã‚‹
 		if (std::abs(bbmin.x) < std::abs(bbmax.x)){
 			if (error2 < bbmin.x * bbmin.x) return 0;
 		}else{
 			if (error2 < bbmax.x * bbmax.x) return 0;
 		}
-	}else if (!by){  // 1,2ÛŒÀA‚Ü‚½‚Í3,4ÛŒÀ‚É‚Ü‚½‚ª‚Á‚Ä‚¢‚é
+	}else if (!by){  // 1,2è±¡é™ã€ã¾ãŸã¯3,4è±¡é™ã«ã¾ãŸãŒã£ã¦ã„ã‚‹
 		if (std::abs(bbmin.y) < std::abs(bbmax.y)){
 			if (error2 < bbmin.y * bbmin.y) return 0;
 		}else{
@@ -334,34 +334,34 @@ __declspec(dllexport) int IntersectionTest(const ON_2dPointArray &qicp2d, int iu
 		}
 	}
 
-	// ’¸“_‚Æ‚Ì‹——£‚ªerrorˆÈ“à‚¾‚Á‚½‚çŒğ·‚ ‚è
+	// é ‚ç‚¹ã¨ã®è·é›¢ãŒerrorä»¥å†…ã ã£ãŸã‚‰äº¤å·®ã‚ã‚Š
 	for (int i = 1; i < 5; ++i){
 		double &err2_vertex = err2_vertices[indices[i]];
 		if (err2_vertex < 0) err2_vertex = (pts[i].x * pts[i].x + pts[i].y * pts[i].y);
 		if (err2_vertex < error2) return 1;
 	}
 
-	// ƒGƒbƒW‚ÉÚ‚µ‚Ä‚¢‚½‚çŒğ·‚ ‚è
+	// ã‚¨ãƒƒã‚¸ã«æ¥ã—ã¦ã„ãŸã‚‰äº¤å·®ã‚ã‚Š
 	double vy[5], cc[5];
 	int ints_count = 0;
 	for (int i = 1; i < 5; ++i){
-		// ‰AŠÖ”‚ÅŒvZ‚·‚é‚±‚Æ‚Å‚‘¬‰»
+		// é™°é–¢æ•°ã§è¨ˆç®—ã™ã‚‹ã“ã¨ã§é«˜é€ŸåŒ–
 		ON_2dVector p1 = pts[i], p2 = pts[i+1];
 		ON_2dVector v = p2 - p1;
 		double c = p1.x*p2.y - p1.y*p2.x;
 		cc[i] = c;
-		// ü•ªp1-p2‚Æd‚È‚é’¼ü‚ğl1‚Æ‚·‚é‚ÆAl1 : -v.y * x + v.x * y + c = 0 ‚Æ‚È‚éB
-		// Œ´“_‚ğ’Ê‚èAl1‚Æ‚’¼‚È’¼ül2‚ÍA   l2 :  v.x * x + v.y * y = 0 ‚Æ‚È‚éB
+		// ç·šåˆ†p1-p2ã¨é‡ãªã‚‹ç›´ç·šã‚’l1ã¨ã™ã‚‹ã¨ã€l1 : -v.y * x + v.x * y + c = 0 ã¨ãªã‚‹ã€‚
+		// åŸç‚¹ã‚’é€šã‚Šã€l1ã¨å‚ç›´ãªç›´ç·šl2ã¯ã€   l2 :  v.x * x + v.y * y = 0 ã¨ãªã‚‹ã€‚
 		double l2inv = 1.0 / (v.x*v.x + v.y*v.y); // v.LengthSquared();
-		// l1 ‚Æ l2 ‚ÌŒğ“_I‚ÍA (c*v.y*l2inv, -c*v.x*l2inv) ‚Æ‚È‚éB
-		// ‚Ü‚½A’¼ül1‚ÆŒ´“_‚Æ‚Ì‹——£‚Í |c*l2inv * (v.y, -v.x)| = c*l2inv*sqrt(v.LengthSqured()) = c/v.Length()
-		// ‚æ‚Á‚ÄA‹——£‚Ì2æ‚Í c*c*l2inv‚Æ‚È‚éB
+		// l1 ã¨ l2 ã®äº¤ç‚¹Iã¯ã€ (c*v.y*l2inv, -c*v.x*l2inv) ã¨ãªã‚‹ã€‚
+		// ã¾ãŸã€ç›´ç·šl1ã¨åŸç‚¹ã¨ã®è·é›¢ã¯ |c*l2inv * (v.y, -v.x)| = c*l2inv*sqrt(v.LengthSqured()) = c/v.Length()
+		// ã‚ˆã£ã¦ã€è·é›¢ã®2ä¹—ã¯ c*c*l2invã¨ãªã‚‹ã€‚
 		vy[i] = v.y;
 		double cl2inv = c * l2inv;
-		// ‹——£ŒvZ
+		// è·é›¢è¨ˆç®—
 		if (c*cl2inv < error2){
-			// ü•ª‚ÆŒğ“_‚Æ‚Ì“àŠO”»’è
-			// Œğ“_‚ªŒ´“_‚É—ˆ‚é‚æ‚¤‚Éü•ª‚ğ•½sˆÚ“®‚µ‚Ä”»’è
+			// ç·šåˆ†ã¨äº¤ç‚¹ã¨ã®å†…å¤–åˆ¤å®š
+			// äº¤ç‚¹ãŒåŸç‚¹ã«æ¥ã‚‹ã‚ˆã†ã«ç·šåˆ†ã‚’å¹³è¡Œç§»å‹•ã—ã¦åˆ¤å®š
 			if (std::abs(v.x) > std::abs(v.y)){
 				double xi = -v.y*cl2inv;
 				p1.x += xi, p2.x += xi;
@@ -374,12 +374,12 @@ __declspec(dllexport) int IntersectionTest(const ON_2dPointArray &qicp2d, int iu
 		}
 	}
 
-	// “àŠO”»’è
-	// y=0‚Ì…•½ü‚ğ‰¡Ø‚èA‚©‚Â‚»‚Ì‚Æ‚«‚Ìx‚ª³‚Å‚ ‚é‰ñ”
+	// å†…å¤–åˆ¤å®š
+	// y=0ã®æ°´å¹³ç·šã‚’æ¨ªåˆ‡ã‚Šã€ã‹ã¤ãã®ã¨ãã®xãŒæ­£ã§ã‚ã‚‹å›æ•°
 	for (int i = 1; i < 5; ++i){
-		// ‰º‹L‚Ì2ğŒ‚Ì‚Ç‚¿‚ç‚©‚ğ–‚½‚¹‚ÎƒJƒEƒ“ƒg
-		// ğŒ1 : pts[i].y‚Æpts[i+1].y‚Ì•„†‚ª‹t‚ÅA‚»‚Ìü•ª‚Ìy=0‚Ì‚Æ‚«‚Ìx‚Ì’l‚ª³
-		// ğŒ2 : pts[i].y‚ª‚¿‚å‚¤‚Ç0‚ÅA‚©‚ÂA‘OŒã‚Ìy‚Ì•„†‚ª‹t(=VšŒ^‚É‚È‚Á‚Ä‚¢‚È‚¢)
+		// ä¸‹è¨˜ã®2æ¡ä»¶ã®ã©ã¡ã‚‰ã‹ã‚’æº€ãŸã›ã°ã‚«ã‚¦ãƒ³ãƒˆ
+		// æ¡ä»¶1 : pts[i].yã¨pts[i+1].yã®ç¬¦å·ãŒé€†ã§ã€ãã®ç·šåˆ†ã®y=0ã®ã¨ãã®xã®å€¤ãŒæ­£
+		// æ¡ä»¶2 : pts[i].yãŒã¡ã‚‡ã†ã©0ã§ã€ã‹ã¤ã€å‰å¾Œã®yã®ç¬¦å·ãŒé€†(=Vå­—å‹ã«ãªã£ã¦ã„ãªã„)
 		if ((pts[i].y * pts[i+1].y < 0 && cc[i] * vy[i] >= 0) || 
 			(pts[i].x > 0 && pts[i].y == 0 && pts[i-1].y * pts[i+1].y < 0)) ++ints_count;
 	}
@@ -542,8 +542,8 @@ template <typename T> int IntersectRayBezier_QuasiInterpolating_(const ON_3dRay 
 	std::fclose(fp);
 #endif
 	if (results.size() == 0) return 0;
-	// t‚ğ¸‡ƒ\[ƒg‚µ‚ÄA—×‚è‚Æ‚Ìt‚Ì·‚ªƒgƒŒƒ‰ƒ“ƒXˆÈã‚©‚Ç‚¤‚©‚ğ”»’f‚·‚éB
-	// ƒgƒŒƒ‰ƒ“ƒXˆÈ‰º‚Ìê‡‚ÍŠO‚·B
+	// tã‚’æ˜‡é †ã‚½ãƒ¼ãƒˆã—ã¦ã€éš£ã‚Šã¨ã®tã®å·®ãŒãƒˆãƒ¬ãƒ©ãƒ³ã‚¹ä»¥ä¸Šã‹ã©ã†ã‹ã‚’åˆ¤æ–­ã™ã‚‹ã€‚
+	// ãƒˆãƒ¬ãƒ©ãƒ³ã‚¹ä»¥ä¸‹ã®å ´åˆã¯å¤–ã™ã€‚
 	std::vector<int> indices(results.size());
 	for (int i = 0; i < static_cast<int>(indices.size()); ++i) indices[i] = i;
 	struct Sort{
