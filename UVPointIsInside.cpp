@@ -29,10 +29,21 @@ void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve
 bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance){
 	double t;
 	const ON_BezierCurve *bcn;
-	ON_3dPoint pt;
+	ON_3dPoint pt, ptdmy;
 	double dist = ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(loop_crvs.First(), loop_crvs.Count(), tolerance, ON_3dPoint(uv), bcn, t, pt);
-	ON_3dVector dir_t;
+	ON_3dVector dir_t, dir_tf, dir_tp;
 	bcn->EvTangent(t, pt, dir_t);
+	if (t <= ON_ZERO_TOLERANCE){
+		const ON_BezierCurve *bcn_fwd = (bcn != loop_crvs.First()) ? bcn - 1 : bcn + loop_crvs.Count() - 1;
+		bcn_fwd->EvTangent(1.0, ptdmy, dir_tf);
+		dir_t.Unitize(), dir_tf.Unitize();
+		dir_t += dir_tf;
+	}else if(t >= 1 - ON_ZERO_TOLERANCE){
+		const ON_BezierCurve *bcn_prev = (bcn != loop_crvs.First() + loop_crvs.Count() - 1) ? bcn + 1 : loop_crvs.First();
+		bcn_prev->EvTangent(1.0, ptdmy, dir_tp);
+		dir_t.Unitize(), dir_tp.Unitize();
+		dir_t += dir_tp;
+	}
 	ON_2dVector dir_ct = ON_2dPoint(pt) - uv;
 	return (dir_ct.Length() < tolerance || ON_CrossProduct(dir_ct, ON_2dVector(dir_t))[2] >= 0);
 }

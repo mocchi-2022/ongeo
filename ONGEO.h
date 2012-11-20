@@ -48,6 +48,9 @@ ONGEO_DECL int ONGEO_IntersectRayBezier_QuasiInterpolating(const ON_3dRay &ray, 
 
 ONGEO_DECL void ONGEO_CalculateMinMaxWeight(const ON_BezierSurface &src, double &wmin, double &wmax);
 
+/// ベジエ曲線群を包む正確なBoundingBoxを生成する。
+ONGEO_DECL int ONGEO_CalculateTightBoundingBox(const ON_BezierCurve *bcs, int num_bcs, double tolerance, ON_BoundingBox &bb);
+
 /// ベジエ曲面を包む大まかなBoundingSphereを生成する。
 ONGEO_DECL int ONGEO_CalculateRoughBoundingSphere(const ON_BezierSurface &src, ON_3dPoint &center, double &radius);
 
