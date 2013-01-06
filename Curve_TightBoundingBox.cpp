@@ -39,10 +39,10 @@ int ONGEO_CalculateTightBoundingBox(const ON_BezierCurve *bcs, int num_bcs, doub
 			double t;
 			ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod
 				(crvs.First(), num_bcs, tolerance, ptqmin, bcn, t, ptn);
-			tbb.m_min[j] = ptn[0];
+			tbb.m_min[j] = ptn[0] - tolerance;
 			ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod
 				(crvs.First(), num_bcs, tolerance, ptqmax, bcn, t, ptn);
-			tbb.m_max[j] = ptn[0];
+			tbb.m_max[j] = ptn[0] + tolerance;
 		}
 	}
 	bb = tbb;

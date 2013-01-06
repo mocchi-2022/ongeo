@@ -280,7 +280,7 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 				}
 #elif 1
 				// Brent法
-				tc = ONGEO_Polynomial_FindRootByBrentMethod(crange.first, crange.second, &g_coef[0], order_g);
+				tc = ONGEO_Polynomial_FindRootByBrentMethod(crange.first, crange.second, &g_coef[0], order_g, tolerance);
 				gcv = ONGEO_Polynomial_Evaluate(tc, &g_coef[0], order_g);
 				ptc = bcs[k].PointAt(tc);
 				dist2_prev = (ptc-pt_query).LengthSquared();

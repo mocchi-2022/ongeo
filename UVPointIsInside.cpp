@@ -3,6 +3,8 @@
 #define NOMINMAX
 #include "opennurbs.h"
 #include "ONGEO.h"
+#include <cmath>
+#include <limits>
 
 void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop){
 	num_crvs_in_a_loop.Empty();
@@ -45,5 +47,44 @@ bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, cons
 		dir_t += dir_tp;
 	}
 	ON_2dVector dir_ct = ON_2dPoint(pt) - uv;
+	return (dir_ct.Length() < tolerance || ON_CrossProduct(dir_ct, ON_2dVector(dir_t))[2] >= 0);
+}
+
+bool ONGEO_UVPointIsInside(const ON_Polyline *loop_pols, int num_loop_pols, const ON_2dPoint &uv, double tolerance){
+	double t;
+	ON_3dPoint pt, ptdmy, uv3d(uv);
+	bool rc = false;
+	double dist2_min = std::numeric_limits<double>::max();
+	int imin = -1;
+	for (int i = 0; i < num_loop_pols; ++i){
+		ON_BoundingBox bb = loop_pols[i].BoundingBox();
+		double dist2 = (bb.ClosestPoint(uv3d)-uv3d).LengthSquared();
+		if (dist2_min < dist2) continue;
+
+		bool ret = loop_pols[i].ClosestPointTo(uv3d, &t);
+		if (!ret) continue;
+		rc |= ret;
+		pt = loop_pols[i].PointAt(t);
+		dist2 = (uv-ON_2dPoint(pt)).LengthSquared();
+		if (dist2_min > dist2){
+			dist2_min = dist2;
+			imin = i;
+		}
+	}
+	if (!rc) return false;
+	const ON_Polyline &loop_pol = loop_pols[imin];
+
+	ON_3dVector dir_t = loop_pol.TangentAt(t), dir_tf, dir_tp;
+
+	double ti;
+	double tf = std::modf(t, &ti);
+	if (tf <= ON_ZERO_TOLERANCE){
+		dir_tf = loop_pol.TangentAt(t-0.5);
+		dir_t += dir_tf;
+	}else if(tf >= 1 - ON_ZERO_TOLERANCE){
+		dir_tp = loop_pol.TangentAt(t+0.5);
+		dir_t += dir_tp;
+	}
+	ON_2dVector dir_ct = ON_2dPoint(loop_pol.PointAt(t)) - uv;
 	return (dir_ct.Length() < tolerance || ON_CrossProduct(dir_ct, ON_2dVector(dir_t))[2] >= 0);
 }

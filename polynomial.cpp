@@ -262,7 +262,7 @@ int ONGEO_Polynomial_CalcBinomialCoef(int m, int n){
 // Reference : R.P.Brent,
 //   "An algorithm with guaranteed convergence for finding a zero of a function".
 //    The Computer Journal, 14(1971), pp.422-425.
-double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num) {
+double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num, double tolerance) {
 	double a = ti1, b = ti2;
 	double fa = ONGEO_Polynomial_Evaluate(a, coef, num);
 	double fb = ONGEO_Polynomial_Evaluate(b, coef, num);
@@ -275,7 +275,7 @@ double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const doub
 			a = b, b = c, c = a;
 			fa = fb, fb = fc, fc = fa;
 		}
-		double tol = 2.0 * DBL_EPSILON * std::abs(b) + ON_ZERO_TOLERANCE;
+		double tol = 2.0 * DBL_EPSILON * std::abs(b) + tolerance;
 		double c_b = c - b;
 		double m = 0.5 * c_b;
 		if (std::abs(m) <= tol || fb == 0) break;

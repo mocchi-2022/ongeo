@@ -149,6 +149,14 @@ ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_
 // @return true:uv点はループの中、false:uv点はループの外
 ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance);
 
+// UVカーブを示す折れ線群から、uv点の内外判定を実施する。
+// @param [in] loop_pols LoopのUVカーブとなる折れ線群
+// @param [in] num_loop_pols 閉じた折れ線の数
+// @param [in] uv uv点
+// @param [in] tolerance uv空間内での位置トレランス
+// @return true:uv点はループの中、false:uv点はループの外
+ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_Polyline *loop_pols, int num_loop_pols, const ON_2dPoint &uv, double tolerance);
+
 ONGEO_DECL ONGEO_SphereTree *ONGEO_NewSphereTree(int num, const ON_NurbsSurface *nbsurfs);
 ONGEO_DECL void ONGEO_DeleteSphereTree(ONGEO_SphereTree *);
 ONGEO_DECL int ONGEO_SphereTree_CreateTree(ONGEO_SphereTree *, double radius2, double weight_rate, int level);
@@ -238,5 +246,6 @@ ONGEO_DECL int ONGEO_Polynomial_CalcBinomialCoef(int m, int n);
 // @param ti2 [in] 狭めたい区間の上限 ti1 < ti2であること。
 // @param coef [in] 多項式の係数
 // @param num [in] 多項式の係数の数
+// @param tolerance [in] トレランス
 // @return 根となる値
-ONGEO_DECL double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num);
+ONGEO_DECL double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num, double tolerance);
