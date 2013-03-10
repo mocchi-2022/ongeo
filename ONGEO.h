@@ -67,17 +67,17 @@ ONGEO_DECL bool ONGEO_EigenValue3_Cardano(double *A[], double l[6]);
 /// @return true : 計算成功, false : 失敗
 ONGEO_DECL bool ONGEO_EigenVector3(double *A[], double l, double v[3]);
 
-// 3次元ベクトル配列から3x3の分散共分散行列、または相関係数行列を求める。
-// @param vecs [in] ベクトル配列
-// @param num_vecs [in] ベクトルの数
-// @param calc_corr_coef_matrix [in] false:分散共分散を求める true:相関係数行列を求める。
-// @param A [out] 3x3の行列 領域は呼び出し元で確保すること。
-// @param meanvec [out] 非NULLのとき、平均ベクトルを返す。
+/// 3次元ベクトル配列から3x3の分散共分散行列、または相関係数行列を求める。
+/// @param vecs [in] ベクトル配列
+/// @param num_vecs [in] ベクトルの数
+/// @param calc_corr_coef_matrix [in] false:分散共分散を求める true:相関係数行列を求める。
+/// @param A [out] 3x3の行列 領域は呼び出し元で確保すること。
+/// @param meanvec [out] 非NULLのとき、平均ベクトルを返す。
 ONGEO_DECL void ONGEO_Create_Covariance_Matrix3x3(double *vecs, int num_vecs, bool calc_corr_coef_matrix, double *A[3], double *meanvec = 0);
 
-// 3x3の分散共分散行列から相関係数行列を求める。
-// @param A [in] 3x3の分散共分散行列
-// @param B [out] 3x3の相関係数行列
+/// 3x3の分散共分散行列から相関係数行列を求める。
+/// @param A [in] 3x3の分散共分散行列
+/// @param B [out] 3x3の相関係数行列
 ONGEO_DECL void ONGEO_Covariance2CorrCoef_Matrix3x3(double *A[3], double *B[3]);
 
 /// u、またはvで分割を繰り返し、それぞれの分割された曲面パッチをノードにしたSphere2分木
@@ -134,27 +134,72 @@ struct ONGEO_CLASS ONGEO_SphereTree{
 	void RayIntersectTest(const ON_3dRay &ray, ON_SimpleArray<Result> &results) const;
 };
 
-// Faceが持つLoop群のUVカーブをベジエ曲線群に分解する。
-// @param [in] face 対象のFace要素
-// @param [out] loop_crvs LoopのUVカーブ群
-// @param [out] num_crvs_in_a_loop 各Loopが何個のBezierUVカーブを持っているかを示す。 num_crvs_in_a_loop[0]が外側ループを構成する曲線の数、[1]以降が内側ループ
-//   例えば、loop_crvsの num_crvs_in_a_loop[0]番目～num_crvs_in_a_loop[0]+num_crvs_in_a_loop[1]-1番目までが一つ目の内側のループを構成するBezier曲線を示す。
+/// 複数のBrepに対して交点計算するためのオペレータ。
+struct ONGEO_CLASS ONGEO_BrepsRayIntersect{
+	struct LoopsInAFace{
+		ON_SimpleArray<ON_BezierCurve> loop_crvs;
+		ON_SimpleArray<int> num_crvs_in_a_loop;
+	};
+
+	ON_ClassArray<ON_NurbsSurface> nbsurfs;
+	ON_ClassArray<LoopsInAFace> loops_faces;
+	ON_SimpleArray<int> nbs2brep; // nbsurfのインデックスからbrepのインデックスを求める配列
+	ONGEO_SphereTree *st;
+
+	ONGEO_BrepsRayIntersect(const ON_Brep **breps, int num_breps);
+	ONGEO_BrepsRayIntersect(const ONGEO_BrepsRayIntersect &rhs);
+	ONGEO_BrepsRayIntersect &operator =(const ONGEO_BrepsRayIntersect &rhs);
+	~ONGEO_BrepsRayIntersect();
+
+	struct Result{
+		int nbs_index;
+		ON_2dPoint uv;
+		double t;
+		ON_3dPoint codsrf, codlin;
+	};
+
+	enum TestStage{
+		BeforeIntersectRayBezier, ///< ベジエ曲面との交点計算直前
+		BeforeUVPointIsInside,    ///< UV空間における内外判定の直前
+		AfterUVPointIsInside      ///< UV空間における内外判定後
+	};
+
+	/// 登録してあるBrepに対して交点計算を実施する。
+	/// Test関数を引数として与えると、ベジエ曲面との交点計算、UV内外判定前、及び後の3ステージで関数が呼ばれる。
+	/// Test関数がfalseを返した場合、交点計算対象から外れる。全交点のうち、特定のもののみが必要となるケース
+	/// (例えば、原点に最も近い/遠い交点のみが必要といった場合)で、計算効率を向上できる。
+	void Run(const ON_3dRay &ray, ON_SimpleArray<Result> &result, bool (*Test)(void *data, TestStage stage, int nbsurf_index, const Result *candidate) = 0, void *data = 0) const;
+};
+
+ONGEO_DECL ONGEO_BrepsRayIntersect *ONGEO_New_BrepsRayIntersect(const ON_Brep **breps, int num_breps);
+
+/// 登録してあるBrepに対して交点計算を実施する。
+/// Test関数を引数として与えると、ベジエ曲面との交点計算、UV内外判定前、及び後の3ステージで関数が呼ばれる。
+/// Test関数がfalseを返した場合、交点計算対象から外れる。全交点のうち、特定のもののみが必要となるケース
+/// (例えば、原点に最も近い/遠い交点のみが必要といった場合)で、計算効率を向上できる。
+ONGEO_DECL void ONGEO_BrepsRayIntersect_Run(const ONGEO_BrepsRayIntersect *bri, const ON_3dRay &ray, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &result, bool (*Test)(void *data, ONGEO_BrepsRayIntersect::TestStage stage, int nbsurf_index, const ONGEO_BrepsRayIntersect::Result *candidate) = 0, void *data = 0);
+
+/// Faceが持つLoop群のUVカーブをベジエ曲線群に分解する。
+/// @param [in] face 対象のFace要素
+/// @param [out] loop_crvs LoopのUVカーブ群
+/// @param [out] num_crvs_in_a_loop 各Loopが何個のBezierUVカーブを持っているかを示す。 num_crvs_in_a_loop[0]が外側ループを構成する曲線の数、[1]以降が内側ループ
+///   例えば、loop_crvsの num_crvs_in_a_loop[0]番目～num_crvs_in_a_loop[0]+num_crvs_in_a_loop[1]-1番目までが一つ目の内側のループを構成するBezier曲線を示す。
 ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop);
 
-// UVカーブを示すベジエ曲線群から、uv点の内外判定を実施する。
-// @param [in] loop_crvs LoopのUVカーブ群
-// @param [in] num_crvs_in_a_loop 各Loopが何個のBezierUVカーブを持っているか
-// @param [in] uv uv点
-// @param [in] tolerance uv空間内での位置トレランス
-// @return true:uv点はループの中、false:uv点はループの外
+/// UVカーブを示すベジエ曲線群から、uv点の内外判定を実施する。
+/// @param [in] loop_crvs LoopのUVカーブ群
+/// @param [in] num_crvs_in_a_loop 各Loopが何個のBezierUVカーブを持っているか
+/// @param [in] uv uv点
+/// @param [in] tolerance uv空間内での位置トレランス
+/// @return true:uv点はループの中、false:uv点はループの外
 ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance);
 
-// UVカーブを示す折れ線群から、uv点の内外判定を実施する。
-// @param [in] loop_pols LoopのUVカーブとなる折れ線群
-// @param [in] num_loop_pols 閉じた折れ線の数
-// @param [in] uv uv点
-// @param [in] tolerance uv空間内での位置トレランス
-// @return true:uv点はループの中、false:uv点はループの外
+/// UVカーブを示す折れ線群から、uv点の内外判定を実施する。
+/// @param [in] loop_pols LoopのUVカーブとなる折れ線群
+/// @param [in] num_loop_pols 閉じた折れ線の数
+/// @param [in] uv uv点
+/// @param [in] tolerance uv空間内での位置トレランス
+/// @return true:uv点はループの中、false:uv点はループの外
 ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_Polyline *loop_pols, int num_loop_pols, const ON_2dPoint &uv, double tolerance);
 
 ONGEO_DECL ONGEO_SphereTree *ONGEO_NewSphereTree(int num, const ON_NurbsSurface *nbsurfs);
@@ -166,86 +211,86 @@ ONGEO_DECL int ONGEO_SphereTree_GetNurbsIndexFromBezIndex(const ONGEO_SphereTree
 ONGEO_DECL int ONGEO_SphereTree_GetFirstBezIndexFromBezIndex(const ONGEO_SphereTree *, int bez_index);
 ONGEO_DECL int ONGEO_SphereTree_GetNurbsIntervalFromBezIndex(const ONGEO_SphereTree *, const ON_NurbsSurface *nbsurfs, int bez_index, ON_Interval range[2]);
 
-// 多項式関数に値を代入して計算する。
-// @param [in] t 代入する値
-// @param [in] coef 多項式の係数列
-// @param [in] num 係数の個数(=次数+1)
-// @return 計算結果
+/// 多項式関数に値を代入して計算する。
+/// @param [in] t 代入する値
+/// @param [in] coef 多項式の係数列
+/// @param [in] num 係数の個数(=次数+1)
+/// @return 計算結果
 ONGEO_DECL double ONGEO_Polynomial_Evaluate(double t, const double *coef, int num);
 
-// 2つの多項式の和を求める。
-// @param [in] coef1 1つめの多項式の係数列 num1 == 0 のときに限り、coef1はヌルポインタでも可
-// @param [in] num1 1つめの多項式の係数の個数(=次数+1)
-// @param [in] coef2 2つめの多項式の係数列 num2 == 0 のときに限り、coef2はヌルポインタでも可
-// @param [in] num2 2つめの多項式の係数の個数(=次数+1)
-// @param [out] coef_add 多項式1 + 多項式2を示す多項式の係数列
-// @param [in] num 出力多項式の係数の個数 (num1 <= num かつ num2 <= numであること  coef1 または coef2と同じ場所を指していても適切に計算可能)
-// @return true:成功、 false:失敗
+/// 2つの多項式の和を求める。
+/// @param [in] coef1 1つめの多項式の係数列 num1 == 0 のときに限り、coef1はヌルポインタでも可
+/// @param [in] num1 1つめの多項式の係数の個数(=次数+1)
+/// @param [in] coef2 2つめの多項式の係数列 num2 == 0 のときに限り、coef2はヌルポインタでも可
+/// @param [in] num2 2つめの多項式の係数の個数(=次数+1)
+/// @param [out] coef_add 多項式1 + 多項式2を示す多項式の係数列
+/// @param [in] num 出力多項式の係数の個数 (num1 <= num かつ num2 <= numであること  coef1 または coef2と同じ場所を指していても適切に計算可能)
+/// @return true:成功、 false:失敗
 ONGEO_DECL bool ONGEO_Polynomial_Add(const double *coef1, int num1, const double *coef2, int num2, double *coef_add, int num_add);
 
-// 2つの多項式の差を求める。
-// @param [in] coef1 1つめの多項式の係数列 num1 == 0 のときに限り、coef1はヌルポインタでも可
-// @param [in] num1 1つめの多項式の係数の個数(=次数+1)
-// @param [in] coef2 2つめの多項式の係数列 num2 == 0 のときに限り、coef2はヌルポインタでも可
-// @param [in] num2 2つめの多項式の係数の個数(=次数+1)
-// @param [out] coef_sub 多項式1 - 多項式2を示す多項式の係数列
-// @param [in] num 出力多項式の係数の個数 (num1 <= num かつ num2 <= numであること  coef1 または coef2と同じ場所を指していても適切に計算可能)
-// @return true:成功、 false:失敗
+/// 2つの多項式の差を求める。
+/// @param [in] coef1 1つめの多項式の係数列 num1 == 0 のときに限り、coef1はヌルポインタでも可
+/// @param [in] num1 1つめの多項式の係数の個数(=次数+1)
+/// @param [in] coef2 2つめの多項式の係数列 num2 == 0 のときに限り、coef2はヌルポインタでも可
+/// @param [in] num2 2つめの多項式の係数の個数(=次数+1)
+/// @param [out] coef_sub 多項式1 - 多項式2を示す多項式の係数列
+/// @param [in] num 出力多項式の係数の個数 (num1 <= num かつ num2 <= numであること  coef1 または coef2と同じ場所を指していても適切に計算可能)
+/// @return true:成功、 false:失敗
 ONGEO_DECL bool ONGEO_Polynomial_Subtract(const double *coef1, int num1, const double *coef2, int num2, double *coef_sub, int num_sub);
 
-	// 2つの多項式の積を多項式として展開する。
-// @param [in] coef1 1つめの多項式の係数列
-// @param [in] num1 1つめの多項式の係数の個数(=次数+1)
-// @param [in] coef2 2つめの多項式の係数列
-// @param [in] num2 2つめの多項式の係数の個数(=次数+1)
-// @param [out] coef_mul 2つの多項式の積を展開した多項式の係数列
-//	([num1+num2-2]次の多項式となるため、入力側でnum1+num2-1個分の係数の領域を確保する必要がある。)
+/// 2つの多項式の積を多項式として展開する。
+/// @param [in] coef1 1つめの多項式の係数列
+/// @param [in] num1 1つめの多項式の係数の個数(=次数+1)
+/// @param [in] coef2 2つめの多項式の係数列
+/// @param [in] num2 2つめの多項式の係数の個数(=次数+1)
+/// @param [out] coef_mul 2つの多項式の積を展開した多項式の係数列
+///	([num1+num2-2]次の多項式となるため、入力側でnum1+num2-1個分の係数の領域を確保する必要がある。)
 ONGEO_DECL void ONGEO_Polynomial_Multiply(const double *coef1, int num1, const double *coef2, int num2, double *coef_mul);
 
-// 多項式を一階微分する。
-// @param [in] coef 多項式の係数列
-// @param [in] num 多項式の係数の個数(=次数+1)
-// @param [out] coef_dif 微分した多項式の係数列
-//    (呼び出し元でnum-1個分の領域を確保すること
-//     coefと同じ場所に結果を上書きしたい場合は、この引数として&coef[1]を渡し、本関数呼出し後にcoef[0] = 0.0とすること)
+/// 多項式を一階微分する。
+/// @param [in] coef 多項式の係数列
+/// @param [in] num 多項式の係数の個数(=次数+1)
+/// @param [out] coef_dif 微分した多項式の係数列
+///    (呼び出し元でnum-1個分の領域を確保すること
+///     coefと同じ場所に結果を上書きしたい場合は、この引数として&coef[1]を渡し、本関数呼出し後にcoef[0] = 0.0とすること)
 ONGEO_DECL void ONGEO_Polynomial_Differential(const double *coef, int num, double *coef_dif);
 
-// 多項式の係数列からSturm列を生成する。
-// @param coef [in] 多項式の係数列 (次数の大きい順)
-// @param num [in] 多項式の係数の数
-// @param s [out] Sturm列 (呼び出し元でnf*nf個分の領域を確保すること)
+/// 多項式の係数列からSturm列を生成する。
+/// @param coef [in] 多項式の係数列 (次数の大きい順)
+/// @param num [in] 多項式の係数の数
+/// @param s [out] Sturm列 (呼び出し元でnf*nf個分の領域を確保すること)
 ONGEO_DECL void ONGEO_Polynomial_CreateSturmSequence(const double *coef, int num, double *strum);
 
-// Sturm列を用いて、指定した値での符号反転回数を計算する。
-// @param t [in] 値
-// @param sturm [in] Sturm列
-// @param num [in] 多項式の係数の数 (Sturm列の配列長はnum*num)
-// @return 符号反転回数
+/// Sturm列を用いて、指定した値での符号反転回数を計算する。
+/// @param t [in] 値
+/// @param sturm [in] Sturm列
+/// @param num [in] 多項式の係数の数 (Sturm列の配列長はnum*num)
+/// @return 符号反転回数
 ONGEO_DECL int ONGEO_Polynomial_NumberOfSignChangesOfSturmSequence(double t, const double *strum, int num);
 
-// Sturm列を用いて、指定した区間内の多項式の根の数を計算する。
-// @param t1 [in] 区間の下限
-// @param t2 [in] 区間の上限(t1 < t2 であること)
-// @param sturm [in] Sturm列
-// @param num [in] 多項式の係数の数 (Sturm列の配列長はnum*num)
-// @return 解の個数(エラーの場合、負数)
+/// Sturm列を用いて、指定した区間内の多項式の根の数を計算する。
+/// @param t1 [in] 区間の下限
+/// @param t2 [in] 区間の上限(t1 < t2 であること)
+/// @param sturm [in] Sturm列
+/// @param num [in] 多項式の係数の数 (Sturm列の配列長はnum*num)
+/// @return 解の個数(エラーの場合、負数)
 ONGEO_DECL int ONGEO_Polynomial_CalculateNumRoot(double t1, double t2, const double *strum, int num);
 
-// パスカルの三角形のdim+1行目を計算し、関数側で用意した配列を返す。
-// @param dim [in] 計算対象の次数
-// @return パスカルの三角形のdim+1行目 長さ dim+1の配列を返す。配列は関数が管理するため、delete[]等で解放してはならない。
+/// パスカルの三角形のdim+1行目を計算し、関数側で用意した配列を返す。
+/// @param dim [in] 計算対象の次数
+/// @return パスカルの三角形のdim+1行目 長さ dim+1の配列を返す。配列は関数が管理するため、delete[]等で解放してはならない。
 ONGEO_DECL int *ONGEO_Polynomial_CalcPascalTriangle(int dim);
 
-// パスカルの三角形を使用して二項係数 mCn を計算する。
-// @param m, n [in] 係数
-// @return 二項係数
+/// パスカルの三角形を使用して二項係数 mCn を計算する。
+/// @param m, n [in] 係数
+/// @return 二項係数
 ONGEO_DECL int ONGEO_Polynomial_CalcBinomialCoef(int m, int n);
 
-// Brent法を用いて根を求める。区間 ti1 - ti2 の中で単調増加、または単調減少であること。
-// @param ti1 [in] 狭めたい区間の下限
-// @param ti2 [in] 狭めたい区間の上限 ti1 < ti2であること。
-// @param coef [in] 多項式の係数
-// @param num [in] 多項式の係数の数
-// @param tolerance [in] トレランス
-// @return 根となる値
+/// Brent法を用いて根を求める。区間 ti1 - ti2 の中で単調増加、または単調減少であること。
+/// @param ti1 [in] 狭めたい区間の下限
+/// @param ti2 [in] 狭めたい区間の上限 ti1 < ti2であること。
+/// @param coef [in] 多項式の係数
+/// @param num [in] 多項式の係数の数
+/// @param tolerance [in] トレランス
+/// @return 根となる値
 ONGEO_DECL double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num, double tolerance);

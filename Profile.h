@@ -14,7 +14,7 @@ static struct Profile{
 	Profile(){
 	}
 	~Profile(){
-		FILE *fp = std::fopen("d:/profile.txt", "w");
+		FILE *fp = std::fopen("d:/profile.txt", "a");
 		LARGE_INTEGER freq;
 		::QueryPerformanceFrequency(&freq);
 		double dfreq = static_cast<double>(freq.QuadPart);

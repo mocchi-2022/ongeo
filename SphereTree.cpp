@@ -22,7 +22,7 @@ namespace{
 			node.childLeft = node.childRight = -1;
 			nodes.Append(node);
 		}
-		if (bezs.Count() == 1){
+		if (bezs.Count() <= 1){
 			return;
 		}
 		std::vector<int> cbuf(bezs.Count()), tbuf(bezs.Count());
