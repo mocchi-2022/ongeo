@@ -160,15 +160,17 @@ struct ONGEO_CLASS ONGEO_BrepsRayIntersect{
 
 	enum TestStage{
 		BeforeIntersectRayBezier, ///< ベジエ曲面との交点計算直前
-		BeforeUVPointIsInside,    ///< UV空間における内外判定の直前
-		AfterUVPointIsInside      ///< UV空間における内外判定後
+		BeforeUVPointIsInside,    ///< UV空間における内外判定の直前。この直前のタイミングでresultsに交点情報が追記される。falseを返すとresultsに今回追記された交点情報が削除される。
+		AfterUVPointIsInside      ///< UV空間における内外判定後。falseを返すとresultsに今回追記された交点情報が削除される。
 	};
 
 	/// 登録してあるBrepに対して交点計算を実施する。
 	/// Test関数を引数として与えると、ベジエ曲面との交点計算、UV内外判定前、及び後の3ステージで関数が呼ばれる。
 	/// Test関数がfalseを返した場合、交点計算対象から外れる。全交点のうち、特定のもののみが必要となるケース
 	/// (例えば、原点に最も近い/遠い交点のみが必要といった場合)で、計算効率を向上できる。
-	void Run(const ON_3dRay &ray, ON_SimpleArray<Result> &result, bool (*Test)(void *data, TestStage stage, int nbsurf_index, const Result *candidate) = 0, void *data = 0) const;
+	/// Test関数には、Run呼び出し時に引数として与えられたresult配列の参照が渡される。
+	/// Test関数内でresultの内容を変えることができる。
+	void Run(const ON_3dRay &ray, ON_SimpleArray<Result> &results, double tolerance = 1e-5, bool (*Test)(void *data, TestStage stage, int nbsurf_index, ON_SimpleArray<Result> &results) = 0, void *data = 0) const;
 };
 
 ONGEO_DECL ONGEO_BrepsRayIntersect *ONGEO_New_BrepsRayIntersect(const ON_Brep **breps, int num_breps);
@@ -177,7 +179,7 @@ ONGEO_DECL ONGEO_BrepsRayIntersect *ONGEO_New_BrepsRayIntersect(const ON_Brep **
 /// Test関数を引数として与えると、ベジエ曲面との交点計算、UV内外判定前、及び後の3ステージで関数が呼ばれる。
 /// Test関数がfalseを返した場合、交点計算対象から外れる。全交点のうち、特定のもののみが必要となるケース
 /// (例えば、原点に最も近い/遠い交点のみが必要といった場合)で、計算効率を向上できる。
-ONGEO_DECL void ONGEO_BrepsRayIntersect_Run(const ONGEO_BrepsRayIntersect *bri, const ON_3dRay &ray, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &result, bool (*Test)(void *data, ONGEO_BrepsRayIntersect::TestStage stage, int nbsurf_index, const ONGEO_BrepsRayIntersect::Result *candidate) = 0, void *data = 0);
+ONGEO_DECL void ONGEO_BrepsRayIntersect_Run(const ONGEO_BrepsRayIntersect *bri, const ON_3dRay &ray, double tolerance, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &result, bool (*Test)(void *data, ONGEO_BrepsRayIntersect::TestStage stage, int nbsurf_index, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &results) = 0, void *data = 0);
 
 /// Faceが持つLoop群のUVカーブをベジエ曲線群に分解する。
 /// @param [in] face 対象のFace要素

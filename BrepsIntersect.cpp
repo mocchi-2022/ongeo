@@ -45,7 +45,7 @@ ONGEO_BrepsRayIntersect &ONGEO_BrepsRayIntersect::operator =(const ONGEO_BrepsRa
 	return *this;
 }
 
-void ONGEO_BrepsRayIntersect::Run(const ON_3dRay &ray, ON_SimpleArray<Result> &results, bool (*Test)(void *data, TestStage stage, int nbsurf_index, const Result *candidate), void *data) const{
+void ONGEO_BrepsRayIntersect::Run(const ON_3dRay &ray, ON_SimpleArray<Result> &results, double tolerance, bool (*Test)(void *data, TestStage stage, int nbsurf_index, ON_SimpleArray<Result> &results), void *data) const{
 	PROF("ONGEO_BrepsRayIntersect::Run");
 	ON_SimpleArray<ONGEO_SphereTree::Result> stres;
 	st->RayIntersectTest(ray, stres);
@@ -61,10 +61,10 @@ void ONGEO_BrepsRayIntersect::Run(const ON_3dRay &ray, ON_SimpleArray<Result> &r
 		range[0] = range[0].ParameterAt(stre.uint);
 		range[1] = range[1].ParameterAt(stre.vint);
 
-		if (Test && !Test(data, BeforeIntersectRayBezier, nbsurf_index, 0)) continue;
+		if (Test && !Test(data, BeforeIntersectRayBezier, nbsurf_index, results)) continue;
 
 		ON_3dPointArray tuvs, ptsrf, ptlin;
-		ONGEO_IntersectRayBezier_QuasiInterpolating(ray, bez, tuvs, ptsrf, ptlin, 1e-4);
+		ONGEO_IntersectRayBezier_QuasiInterpolating(ray, bez, tuvs, ptsrf, ptlin, tolerance);
 		for (int i = 0; i < tuvs.Count(); ++i){
 			const LoopsInAFace &lif = loops_faces[nbsurf_index];
 			bool inside = true;
@@ -75,15 +75,12 @@ void ONGEO_BrepsRayIntersect::Run(const ON_3dRay &ray, ON_SimpleArray<Result> &r
 			res.t = tuvs[i][0];
 			res.nbs_index = nbsurf_index;
 
-			if (Test && !Test(data, BeforeUVPointIsInside, nbsurf_index, &res)) continue;
-			if (!ONGEO_UVPointIsInside(lif.loop_crvs, lif.num_crvs_in_a_loop, res.uv, 1e-4)){
-				results.Remove();
-				continue;
-			}
-			if (Test && !Test(data, AfterUVPointIsInside, nbsurf_index, &res)){
-				results.Remove();
-				continue;
-			}
+			if (Test && !Test(data, BeforeUVPointIsInside, nbsurf_index, results)) goto CANCEL_ADD;
+			if (!ONGEO_UVPointIsInside(lif.loop_crvs, lif.num_crvs_in_a_loop, res.uv, tolerance)) goto CANCEL_ADD;
+			if (Test && !Test(data, AfterUVPointIsInside, nbsurf_index, results)) goto CANCEL_ADD;
+			continue;
+CANCEL_ADD:
+			results.Remove();
 		}
 	}
 }
@@ -92,6 +89,6 @@ ONGEO_BrepsRayIntersect *ONGEO_New_BrepsRayIntersect(const ON_Brep **breps, int 
 	return new ONGEO_BrepsRayIntersect(breps, num_breps);
 }
 
-void ONGEO_BrepsRayIntersect_Run(const ONGEO_BrepsRayIntersect *bri, const ON_3dRay &ray, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &result, bool (*Test)(void *data, ONGEO_BrepsRayIntersect::TestStage stage, int nbsurf_index, const ONGEO_BrepsRayIntersect::Result *candidate), void *data){
-	bri->Run(ray, result, Test, data);
+void ONGEO_BrepsRayIntersect_Run(const ONGEO_BrepsRayIntersect *bri, const ON_3dRay &ray, double tolerance, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &result, bool (*Test)(void *data, ONGEO_BrepsRayIntersect::TestStage stage, int nbsurf_index, ON_SimpleArray<ONGEO_BrepsRayIntersect::Result> &results), void *data){
+	bri->Run(ray, result, tolerance, Test, data);
 }
