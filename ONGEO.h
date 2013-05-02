@@ -92,7 +92,7 @@ struct ONGEO_CLASS ONGEO_SphereTree{
 	};
 	ON_SimpleArray<int> nurbs_index_to_bez_first_index;
 	int num_root_bezsurfs;
-	ON_SimpleArray<ON_BezierSurface> bezs;
+	ON_ClassArray<ON_BezierSurface> bezs;
 	ON_SimpleArray<Node> nodes;
 	ONGEO_SphereTree(int num_surfs, const ON_NurbsSurface *nbsurf);
 	~ONGEO_SphereTree();
@@ -137,7 +137,7 @@ struct ONGEO_CLASS ONGEO_SphereTree{
 /// 複数のBrepに対して交点計算するためのオペレータ。
 struct ONGEO_CLASS ONGEO_BrepsRayIntersect{
 	struct LoopsInAFace{
-		ON_SimpleArray<ON_BezierCurve> loop_crvs;
+		ON_ClassArray<ON_BezierCurve> loop_crvs;
 		ON_SimpleArray<int> num_crvs_in_a_loop;
 	};
 
@@ -186,7 +186,7 @@ ONGEO_DECL void ONGEO_BrepsRayIntersect_Run(const ONGEO_BrepsRayIntersect *bri, 
 /// @param [out] loop_crvs LoopのUVカーブ群
 /// @param [out] num_crvs_in_a_loop 各Loopが何個のBezierUVカーブを持っているかを示す。 num_crvs_in_a_loop[0]が外側ループを構成する曲線の数、[1]以降が内側ループ
 ///   例えば、loop_crvsの num_crvs_in_a_loop[0]番目～num_crvs_in_a_loop[0]+num_crvs_in_a_loop[1]-1番目までが一つ目の内側のループを構成するBezier曲線を示す。
-ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop);
+ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_ClassArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop);
 
 /// UVカーブを示すベジエ曲線群から、uv点の内外判定を実施する。
 /// @param [in] loop_crvs LoopのUVカーブ群
@@ -194,7 +194,7 @@ ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_
 /// @param [in] uv uv点
 /// @param [in] tolerance uv空間内での位置トレランス
 /// @return true:uv点はループの中、false:uv点はループの外
-ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance);
+ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance);
 
 /// UVカーブを示す折れ線群から、uv点の内外判定を実施する。
 /// @param [in] loop_pols LoopのUVカーブとなる折れ線群
@@ -296,3 +296,109 @@ ONGEO_DECL int ONGEO_Polynomial_CalcBinomialCoef(int m, int n);
 /// @param tolerance [in] トレランス
 /// @return 根となる値
 ONGEO_DECL double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num, double tolerance);
+
+/// IGESデータを扱うクラス
+struct ONGEO_CLASS ONGEO_IgesModel{
+	ON_String ss;
+	struct GlobalSection{
+		ON_String parm_delimiter;
+		ON_String record_delimiter;
+		ON_String product_id_sending;
+		ON_String file_name;
+		ON_String native_system_id;
+		ON_String preprocessor_version;
+		int num_of_binbits_for_intrep;
+		int max_pow_float;
+		int num_of_digits_float;
+		int max_pow_double;
+		int num_of_digits_double;
+		ON_String product_id_receiving;
+		double model_scale;
+		int unit_flag;
+		ON_String unit_name;
+		int max_num_lineweight_grad;
+		double width_of_max_line_weight;
+		ON_String timestamp_filegen;
+		double min_resolution_in_unit;
+		double approx_max_cod_in_unit;
+		ON_String name_author;
+		ON_String authors_org;
+		int flag_version;
+		int flag_draft_std;
+		ON_String timestamp_filemod;
+		ON_String desc_protocol;
+	}gs;
+	struct DirectoryEntrySection{
+		int entity_type;
+		int param_data;
+		int structure;
+		int line_font;
+		int level;
+		int view;
+		int trans_matrix;
+		int label_disp;
+		struct{
+			int blank_status:4;  // 0:visible, 1:blancked
+			int subord_ent_sw:4; // 0:independent, 1:physically dependent, 2:logically dependent, 3: both 1 and 2
+			int ent_use_flg:4;   // 0:geometry, 1:annotation, 2:definition, 3:other, 4:logical/positional, 5:2D parametric, 6:construction geometry
+			int hierarchy:4;     // 0:global top down, 1:global defer, 2:use hierarchy property
+		}stnum;
+		int line_weight;
+		int color_num;
+		int param_line_count;
+		int form_num;
+		int reserved[2];
+		char ent_label[9];
+		int ent_subscript;
+	};
+	ON_SimpleArray<DirectoryEntrySection> des;
+	ON_ClassArray<ON_String> ps;
+
+	ONGEO_IgesModel();
+	ONGEO_IgesModel(const char *filename);
+	ONGEO_IgesModel(const ONGEO_IgesModel &rhs);
+	ONGEO_IgesModel &operator =(const ONGEO_IgesModel &rhs);
+	bool Load(const char *filename);
+	bool Save(const char *filename);
+	void Clear();
+
+	/// 指定したインデックスのEntityを空にする(NULLエンティティ化する)。
+	/// @param [in] index Directory Entry配列のインデックス
+	/// @return true:成功、false:失敗
+	bool SetEntityClearOut(int index);
+
+	~ONGEO_IgesModel();
+};
+
+ONGEO_DECL ONGEO_IgesModel *ONGEO_NewIgesModel();
+ONGEO_DECL ONGEO_IgesModel *ONGEO_NewIgesModel(const char *filename);
+ONGEO_DECL void ONGEO_DeleteIgesModel(ONGEO_IgesModel *);
+ONGEO_DECL bool ONGEO_IgesModel_Load(ONGEO_IgesModel *, const char *filename);
+ONGEO_DECL bool ONGEO_IgesModel_Save(ONGEO_IgesModel *, const char *filename);
+ONGEO_DECL void ONGEO_IgesModel_Clear(ONGEO_IgesModel *);
+
+/// 指定したインデックスのEntityを空にする(NULLエンティティ化する)。
+/// @param [in] index Directory Entry配列のインデックス
+/// @return true:成功、false:失敗
+ONGEO_DECL void ONGEO_IgesModel_SetEntityClearOut(ONGEO_IgesModel *, int index);
+
+
+/// 3dm要素とIges要素との対応情報
+struct ONGEO_CLASS ONGEO_IgesTo3dmInfo{
+	ONGEO_IgesTo3dmInfo();
+	~ONGEO_IgesTo3dmInfo();
+	struct Impl;
+	Impl *pimpl;
+
+	int DEIndexFromObject(const ON_Object *) const;
+private:
+	ONGEO_IgesTo3dmInfo(const ONGEO_IgesTo3dmInfo &);
+	ONGEO_IgesTo3dmInfo &operator =(const ONGEO_IgesTo3dmInfo &);
+};
+
+ONGEO_DECL ONGEO_IgesTo3dmInfo *ONGEO_NewIgesTo3dmInfo();
+ONGEO_DECL void ONGEO_DeleteIgesTo3dmInfo(ONGEO_IgesTo3dmInfo *);
+ONGEO_DECL int ONGEO_IgesTo3dmInfo_DEIndexFromObject(const ONGEO_IgesTo3dmInfo *, const ON_Object *);
+
+/// IGESデータを読み込み、ONX_Modelに格納する関数
+bool ONGEO_CLASS ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dmInfo &info);

@@ -12,7 +12,7 @@
 #include "Profile.h"
 
 namespace{
-	void CreateInitialTree(const ON_SimpleArray<ON_BezierSurface> &bezs, ON_SimpleArray<ONGEO_SphereTree::Node> &nodes){
+	void CreateInitialTree(const ON_ClassArray<ON_BezierSurface> &bezs, ON_SimpleArray<ONGEO_SphereTree::Node> &nodes){
 		nodes.Destroy();
 		for (int i = 0; i < bezs.Count(); ++i){
 			ONGEO_SphereTree::Node node;

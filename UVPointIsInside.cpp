@@ -6,7 +6,7 @@
 #include <cmath>
 #include <limits>
 
-void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop){
+void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_ClassArray<ON_BezierCurve> &loop_crvs, ON_SimpleArray<int> &num_crvs_in_a_loop){
 	num_crvs_in_a_loop.Empty();
 	loop_crvs.Empty();
 	for (int k = 0; k < face.LoopCount(); ++k){
@@ -28,7 +28,7 @@ void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_SimpleArray<ON_BezierCurve
 	}
 }
 
-bool ONGEO_UVPointIsInside(const ON_SimpleArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance){
+bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance){
 	double t;
 	const ON_BezierCurve *bcn;
 	ON_3dPoint pt, ptdmy;

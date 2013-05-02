@@ -1,3 +1,6 @@
+// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
+// License: Boost Software License   See LICENSE.txt for the full license.
+
 #include "ONGEO.h"
 #include "Profile.h"
 
