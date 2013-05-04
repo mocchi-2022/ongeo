@@ -66,12 +66,15 @@ namespace{
 
 // ===== ONGEO_IgesTo3dmInfo =====
 struct ONGEO_IgesTo3dmInfo::Impl{
-	void AddDEIndexToObject(ON_Object *obj, int idx){
+	typedef std::pair<const ON_Object *, int> ObjIdxPair;
+
+	// ** Commitより前の処理 **
+	void AddTempDEIndexToObject(ON_Object *obj, int idx){
 		DEIndex *index = new DEIndex();
 		index->deidx = idx;
 		obj->AttachUserData(index);
 	}
-	// AddDeIndexToObjectしてからCommitDEIndicesするまでの間、有効
+	// AddTempDeIndexToObjectしてからCommitDEIndicesするまでの間、有効
 	int GetTempDEIndexFromObject(const ON_Object *obj){
 		ON_UserData *ud = obj->FirstUserData();
 		DEIndex *index;
@@ -80,8 +83,9 @@ struct ONGEO_IgesTo3dmInfo::Impl{
 		return index->deidx;
 	}
 
-	// CommitDEIndices実施後は、GetTempDEIndexFromObjectでIndexをとることはできなくなる。
-	typedef std::pair<const ON_Object *, int> ObjIdxPair;
+	// CommitDEIndices実施後は、Commitより前の処理はできなくなる。
+
+	// ** Commitより以降の処理 **
 	void CommitDEIndices(){
 		for (int i = 0; i < deindices.Count(); ++i){
 			DEIndex *index = deindices[i];
@@ -90,13 +94,34 @@ struct ONGEO_IgesTo3dmInfo::Impl{
 			owner->DetachUserData(index);
 			delete index;
 		}
+		deindices.Empty();
 		obj2DEidx.QuickSort(Compare);
+
+		// NULLポインタは一番後ろにまとまる。これを削除する。
+		for (int i = obj2DEidx.Count() - 1; i >= 0 && !obj2DEidx.Last()->first; --i){
+			obj2DEidx.Remove(i);
+		}
 	}
+
+	void DeleteDEIndexToObject(ON_Object *obj){
+		ObjIdxPair key(obj, 0);
+		int aindex = obj2DEidx.BinarySearch(&key, Compare);
+		if (aindex < 0) return;
+		obj2DEidx[aindex].first = 0;
+	}
+
 	static int Compare(const ObjIdxPair *lhs, const ObjIdxPair *rhs){
-		if( lhs->first < rhs->first ) return -1;
-		if( lhs->first > rhs->first ) return  1;
+		// ソート後、NULLポインタが配列の最後尾にくるように、降順ソートする。
+#if 0
+		if ( lhs->first == rhs->first ) return 0;
+		if ( !lhs->first ) return 1;
+		if ( !rhs->first ) return -1;
+#endif
+		if( lhs->first > rhs->first ) return -1;
+		if( lhs->first < rhs->first ) return  1;
 		return 0;
 	}
+
 private:
 	ON_ClassArray<ObjIdxPair> obj2DEidx;
 	friend struct ONGEO_IgesTo3dmInfo;
@@ -664,7 +689,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				while(*el == ' ' && *el != '\0') ++el;
 				onxobj.m_attributes.m_name = ON_wString(el);
 			}
-			info.pimpl->AddDEIndexToObject(obj, ii);
+			info.pimpl->AddTempDEIndexToObject(obj, ii);
 			objs[ii] = obj;
 			converted[ii] = 1;
 		}
@@ -685,10 +710,12 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 	ONX_Model objdelete;
 	for (int i = 0; i < objs.Count(); ++i){
 		if (!objs[i] || (igs.des[i].stnum.subord_ent_sw & 1) == 0) continue;
+		info.pimpl->DeleteDEIndexToObject(objs[i]);
 		ONX_Model_Object &obj = objdelete.m_object_table.AppendNew();
 		obj.m_object = objs[i];
 		obj.m_bDeleteObject = true;
 	}
+	info.pimpl->CommitDEIndices();
 	return true;
 }
 
