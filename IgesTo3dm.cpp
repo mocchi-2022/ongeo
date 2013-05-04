@@ -26,28 +26,80 @@ namespace{
 	int DEPtr2Index(int deptr){
 		return (deptr > 0) ? (deptr - 1) / 2 : -1;
 	}
+
+	class DEIndex;
+	ON_SimpleArray<DEIndex *> deindices;
+	class DEIndex : public ON_UserData{
+		ON_OBJECT_DECLARE( DEIndex );
+	public:
+		int deidx;
+		DEIndex() : ON_UserData(){
+			m_userdata_uuid = DEIndex::m_DEIndex_class_id.Uuid();
+			m_application_uuid = ON_opennurbs5_id;
+			m_userdata_copycount = 1;
+			deindices.Append(this);
+		}
+		~DEIndex(){ }
+		DEIndex(const DEIndex &rhs);
+		DEIndex &operator =(const DEIndex &rhs){
+			ON_UserData::operator =(rhs);
+			deidx = rhs.deidx;
+			return *this;
+		}
+	};
+	ON_OBJECT_IMPLEMENT( DEIndex, ON_UserData, "66AF7BEC-8D83-497d-A293-EB7968049EAA" );
+
+	template <typename T> T *SafeDup(ON_SimpleArray<ON_Object *> &objs, int idx){
+		if (idx < 0 || idx >= objs.Count()) return 0;
+		T *obj = T::Cast(objs[idx]);
+		if (!obj) return 0;
+		T *objo = obj->Duplicate();
+		return objo;
+	}
+	template <typename T> T *SafeDup(ON_Object * obj_){
+		T *obj = T::Cast(obj_);
+		if (!obj) return 0;
+		T *objo = obj->Duplicate();
+		return objo;
+	}
 }
 
 // ===== ONGEO_IgesTo3dmInfo =====
 struct ONGEO_IgesTo3dmInfo::Impl{
-	std::map<const ON_Object *, int> obj2DEidx;
-	template <typename T> T *SafeDup_(ON_SimpleArray<ON_Object *> &objs, int idx){
-		if (idx < 0 || idx >= objs.Count()) return 0;
-		T *obj = T::Cast(objs[idx]);
-		if (!obj) return 0;
-		obj = obj->Duplicate();
-		if (!obj) return 0;
-		obj2DEidx[obj] = idx;
-		return obj;
+	void AddDEIndexToObject(ON_Object *obj, int idx){
+		DEIndex *index = new DEIndex();
+		index->deidx = idx;
+		obj->AttachUserData(index);
 	}
-	template <typename T> T *SafeDup_(ON_Object * obj_, int idx){
-		T *obj = T::Cast(obj_);
-		if (!obj) return 0;
-		obj = obj->Duplicate();
-		if (!obj) return 0;
-		obj2DEidx[obj] = idx;
-		return obj;
+	// AddDeIndexToObjectしてからCommitDEIndicesするまでの間、有効
+	int GetTempDEIndexFromObject(const ON_Object *obj){
+		ON_UserData *ud = obj->FirstUserData();
+		DEIndex *index;
+		while(ud && !(index = DEIndex::Cast(ud))) ud = ud->Next();
+		if (!ud || !index) return -1;
+		return index->deidx;
 	}
+
+	// CommitDEIndices実施後は、GetTempDEIndexFromObjectでIndexをとることはできなくなる。
+	typedef std::pair<const ON_Object *, int> ObjIdxPair;
+	void CommitDEIndices(){
+		for (int i = 0; i < deindices.Count(); ++i){
+			DEIndex *index = deindices[i];
+			ON_Object *owner = index->Owner();
+			obj2DEidx.Append(ObjIdxPair(owner, index->deidx));
+			owner->DetachUserData(index);
+			delete index;
+		}
+		obj2DEidx.QuickSort(Compare);
+	}
+	static int Compare(const ObjIdxPair *lhs, const ObjIdxPair *rhs){
+		if( lhs->first < rhs->first ) return -1;
+		if( lhs->first > rhs->first ) return  1;
+		return 0;
+	}
+private:
+	ON_ClassArray<ObjIdxPair> obj2DEidx;
+	friend struct ONGEO_IgesTo3dmInfo;
 };
 
 ONGEO_IgesTo3dmInfo::ONGEO_IgesTo3dmInfo(){
@@ -58,8 +110,10 @@ ONGEO_IgesTo3dmInfo::~ONGEO_IgesTo3dmInfo(){
 }
 
 int ONGEO_IgesTo3dmInfo::DEIndexFromObject(const ON_Object *obj) const{
-	std::map<const ON_Object *, int>::iterator iter = pimpl->obj2DEidx.find(obj);
-	return (iter != pimpl->obj2DEidx.end()) ? iter->second : -1;
+	Impl::ObjIdxPair key(obj, 0);
+	int aindex = pimpl->obj2DEidx.BinarySearch(&key, Impl::Compare);
+	if (aindex < 0) return -1;
+	return pimpl->obj2DEidx[aindex].second;
 }
 
 ONGEO_IgesTo3dmInfo *ONGEO_NewIgesTo3dmInfo(){
@@ -72,9 +126,6 @@ int ONGEO_IgesTo3dmInfo_DEIndexFromObject(const ONGEO_IgesTo3dmInfo *oiinfo, con
 	if (!oiinfo) return -1;
 	return oiinfo->DEIndexFromObject(obj);
 }
-
-#define SafeDup(T, X, O, I) (X).pimpl->SafeDup_<T>((O), (I))
-#define SafeDupP(T, X, O) (X).pimpl->SafeDup_<T>((O), (X).DEIndexFromObject(O))
 
 // IgesTo3dm で3dmに変換できるIges Entity
 // Type:100 Circular Arc                    済
@@ -134,7 +185,6 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 
 	// Todo:transformの処理
 	for (int i = 0; i < igs.des.Count(); ++i){
-		printf("index:%d\n", i); fflush(stdout);
 		ON_SimpleArray<int> stack;
 		stack.Append(i);
 		while(stack.Count()){
@@ -213,7 +263,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				ON_PolyCurve *pcrv = prt_pcrv.Duplicate();
 				ON_Curve *crv = 0;
 				for (int h = 0; h < num; ++h){
-					if (crv = SafeDup(ON_Curve, info, objs, ccrv_i[h])) pcrv->Append(crv);
+					if (crv = SafeDup<ON_Curve>(objs, ccrv_i[h])) pcrv->Append(crv);
 				}
 				if (xform) pcrv->Transform(*xform);
 				obj = pcrv;
@@ -293,7 +343,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 					obj = ps;
 				}else if (de.form_num == 1 && closed_crv >= 0){
 					ON_SimpleArray<ON_Curve *> boundary(1);
-					boundary.Append(SafeDup(ON_Curve, info, objs, closed_crv));
+					boundary.Append(SafeDup<ON_Curve>(objs, closed_crv));
 					if (boundary[0]){
 						boundary[0] = boundary[0]->Duplicate();
 						ON_Brep *brep = ON_BrepTrimmedPlane(ON_Plane(equation), boundary, true);
@@ -468,8 +518,8 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 
 				static ON_CurveOnSurface cs_prt;
 				ON_CurveOnSurface *cs = cs_prt.Duplicate();
-				if (bi >= 0) cs->m_c2 = SafeDup(ON_Curve, info, objs, bi);
-				if (ci >= 0) cs->m_c3 = SafeDup(ON_Curve, info, objs, ci);
+				cs->m_c2 = SafeDup<ON_Curve>(objs, bi);
+				cs->m_c3 = SafeDup<ON_Curve>(objs, ci);
 				if (xform) if (cs->m_c3) cs->m_c3->Transform(*xform);
 				obj = cs;
 			}else if (de.entity_type == 144){
@@ -497,7 +547,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				}
 
 				if (si >= 0){
-					ON_Surface *srf = SafeDup(ON_Surface, info, objs, si);
+					ON_Surface *srf = SafeDup<ON_Surface>(objs[si]);
 					if (srf){
 						ON_Brep *brep = ON_Brep::New();
 						ON_BrepFace &f = (boi >= 0) ? (brep->m_S.Append(srf), brep->NewFace(0)) : (brep->Create(srf), brep->m_F[0]);
@@ -510,10 +560,10 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 								ON_BrepVertex &v1 = brep->NewVertex(cs->m_c3->PointAtStart());
 								ON_BrepVertex &v2 = cs->m_c3->IsClosed() ? v1 : brep->NewVertex(cs->m_c3->PointAtEnd());
 								v1.m_tolerance = v2.m_tolerance = 0;
-								ON_BrepEdge &e = brep->NewEdge(v1, v2, brep->AddEdgeCurve(SafeDupP(ON_Curve, info, cs->m_c3)));
+								ON_BrepEdge &e = brep->NewEdge(v1, v2, brep->AddEdgeCurve(cs->m_c3->Duplicate()));
 								e.m_tolerance = 0;
 								if (cs->m_c2){
-									ON_BrepTrim &t = brep->NewTrim(e, false, l, brep->AddTrimCurve(SafeDupP(ON_Curve, info, cs->m_c2)));
+									ON_BrepTrim &t = brep->NewTrim(e, false, l, brep->AddTrimCurve(cs->m_c2->Duplicate()));
 									t.m_tolerance[0] = t.m_tolerance[1] = 0;
 								}
 							}
@@ -606,7 +656,6 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				}
 
 				ONX_Model_Object &onxobj = onx.m_object_table.AppendNew();
-				info.pimpl->obj2DEidx[obj] = ii;
 				onxobj.m_object = obj;
 				onxobj.m_bDeleteObject = true;
 				onxobj.m_attributes = att;
@@ -615,6 +664,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				while(*el == ' ' && *el != '\0') ++el;
 				onxobj.m_attributes.m_name = ON_wString(el);
 			}
+			info.pimpl->AddDEIndexToObject(obj, ii);
 			objs[ii] = obj;
 			converted[ii] = 1;
 		}
@@ -622,7 +672,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 
 	for (int i = 0; i < onx.m_object_table.Count(); ++i){
 		ONX_Model_Object &onxobj = onx.m_object_table[i];
-		int idx = info.DEIndexFromObject(onxobj.m_object);
+		int idx = info.pimpl->GetTempDEIndexFromObject(onxobj.m_object);
 		if (idx < 0) continue;
 		std::map<int, ON_SimpleArray<int> >::iterator iter = oidx2gidx.find(idx);
 		if (iter == oidx2gidx.end()) continue;
@@ -630,6 +680,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 			onxobj.m_attributes.AddToGroup(iter->second[h]);
 		}
 	}
+	info.pimpl->CommitDEIndices();
 
 	ONX_Model objdelete;
 	for (int i = 0; i < objs.Count(); ++i){
