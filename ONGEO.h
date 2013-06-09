@@ -400,5 +400,14 @@ ONGEO_DECL ONGEO_IgesTo3dmInfo *ONGEO_NewIgesTo3dmInfo();
 ONGEO_DECL void ONGEO_DeleteIgesTo3dmInfo(ONGEO_IgesTo3dmInfo *);
 ONGEO_DECL int ONGEO_IgesTo3dmInfo_DEIndexFromObject(const ONGEO_IgesTo3dmInfo *, const ON_Object *);
 
-/// IGESデータを読み込み、ONX_Modelに格納する関数
-bool ONGEO_CLASS ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dmInfo &info);
+/// IGESデータを読み込み、ONX_Modelに格納する
+ONGEO_DECL bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dmInfo &info);
+
+/// バイナリSTLを読み込み、ON_Meshに格納する
+ONGEO_DECL bool ONGEO_ReadBinarySTL(ON_BinaryArchive &ba, ON_Mesh &mesh, ON_String &header);
+
+/// 一行分のテキスト文字列を読み込む
+ONGEO_DECL void ONGEO_ReadLine(ON_BinaryArchive &ba, ON_String &str);
+
+/// テキストSTLを読み込み、ON_Meshに格納する
+ONGEO_DECL bool ONGEO_ReadTextSTL(ON_BinaryArchive &ba, ON_Mesh &mesh, ON_String &modelname);
