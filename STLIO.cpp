@@ -3,6 +3,7 @@
 #include "ONGEO.h"
 
 #include <cstdio>
+#include <cctype>
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
@@ -36,7 +37,7 @@ void ONGEO_ReadLine(ON_BinaryArchive &ba, ON_String &str){
 		size_t cp = ba.CurrentPosition();
 		if (!ba.ReadChar(100, buf)){
 			bs = ba.CurrentPosition() - cp;
-			ba.SeekFromCurrentPosition(bs);
+			ba.SeekFromCurrentPosition(-bs);
 			ba.ReadChar(bs, buf);
 		}
 		for (size_t i = 0; i < bs; ++i){
@@ -61,31 +62,39 @@ bool ONGEO_ReadTextSTL(ON_BinaryArchive &ba, ON_Mesh &mesh, ON_String &modelname
 	int linestate = 0;
 	ON_3fVector fn;
 	ON_3fPoint v[3];
+	bool suspicion_error = false;
 	for(;!ba.AtEnd();){
 		ONGEO_ReadLine(ba, line);
 		if (line.IsEmpty()) continue;
 		
+		if (suspicion_error){
+			for (int i = 0; i < line.Length(); ++i){
+				if (line[i] < 0 || line[i] >= 256 || !std::isalnum(line[i])) return false;
+			}
+		}
+
 		switch(linestate){
 		case 0:
-			if (std::sscanf(line, "%*[ \t]facet normal %f %f %f", &fn.x, &fn.y, &fn.z) < 3) continue;
+			if (suspicion_error = (std::sscanf(line, "%*[ \t]facet normal %f %f %f", &fn.x, &fn.y, &fn.z) < 3))
+				continue;
 			++linestate;
 			break;
 		case 1:
-			if (std::strstr(line, "outer loop") == 0) continue;
+			if (suspicion_error = (std::strstr(line, "outer loop") == 0)) continue;
 			++linestate;
 			break;
 		case 2:
 		case 3:
 		case 4:
-			if (std::sscanf(line, "%*[ \t]vertex %f %f %f", &v[linestate-2].x, &v[linestate-2].y, &v[linestate-2].z) < 3) continue;
+			if (suspicion_error = (std::sscanf(line, "%*[ \t]vertex %f %f %f", &v[linestate-2].x, &v[linestate-2].y, &v[linestate-2].z) < 3)) continue;
 			++linestate;
 			break;
 		case 5:
-			if (std::strstr(line, "endloop") == 0) continue;
+			if (suspicion_error = (std::strstr(line, "endloop") == 0)) continue;
 			++linestate;
 			break;
 		case 6:
-			if (std::strstr(line, "endfacet") == 0) continue;
+			if (suspicion_error = (std::strstr(line, "endfacet") == 0)) continue;
 			linestate = 0;
 			mesh.m_FN.Append(fn);
 			mesh.m_V.Append(v[0]);
