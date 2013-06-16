@@ -203,11 +203,11 @@ template <int N> struct traits{
 // 球の中心が入った半空間とptが含まれる半空間が同じ時は正、異なる時は負
 template <typename Ary>
 double DelaunayDistance(Region<3>::Face &f, ON_2dPoint &pt, Ary &pts){
-	ON_2dPoint v[3] = { pts[f.fids[0]], pts[f.fids[1]], pts[f.fids[2]] };
+	ON_2dPoint v[2] = { pts[f.fids[0]], pts[f.fids[1]] };
 	ON_2dVector n;
 	n.PerpendicularTo(v[1]-v[0]);
 	if (ON_DotProduct(n, pt - v[0]) < 0) n *= -1;
-	ON_Circle cir(v[0], v[1], v[2]);
+	ON_Circle cir(v[0], v[1], pt);
 	if (ON_DotProduct(v[0] - ON_2dPoint(cir.Center()), n) < 0) return cir.radius * -1.0;
 	return cir.radius;
 }
@@ -294,7 +294,7 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 		wall_pos = (bb.m_max[wall_dim] + bb.m_min[wall_dim]) * 0.5;
 
 		double dist_min = std::numeric_limits<double>::max();
-		int side_min;
+		int side_min = -1;
 
 		std::set<Region<N>::Face> fids_w;
 		{
@@ -314,7 +314,7 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 					if (dist_min > dist) dist_min = dist, side_min = side, idx[0] = index, imin = ii;
 				}
 				if (side_min == 0) vids_l[imin] = *vids_l.Last(), vids_l.SetCount(vids_l.Count()-1);
-				else vids_r[imin] = *vids_r.Last(), vids_r.SetCount(vids_r.Count()-1);
+				else if (side_min == 1) vids_r[imin] = *vids_r.Last(), vids_r.SetCount(vids_r.Count()-1);
 				vtx[0] = pts[idx[0]];
 			}
 
@@ -382,22 +382,26 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 
 				// Make_Simplex
 				fstart = 1;
-				int imin;
+				int imin, side_min = -1;
 				double r_min = std::numeric_limits<double>::max();
-				for (int j = 0; j < N-1; ++j){
+				for (int j = 0; j < 2; ++j){
 					ON_SimpleArray<int> &vids_i = (j == 0) ? vids_l : vids_r;
+					if (vids_i.Count() == 0) continue;
 					for (int i = 0; i < vids_i.Count(); ++i){
 						int index = vids_i[i];
 						traits<N>::ON_Point pt = pts[index];
 						
 						double r = DelaunayDistance(f, pt, pts);
-						if (r_min > r) r_min = r, idx[N-1] = index, imin = i;
+						if (r_min > r) r_min = r, idx[N-1] = index, imin = i, side_min = j;
 					}
+				}
+				if (side_min != -1){
+					ON_SimpleArray<int> &vids_i = (side_min == 0) ? vids_l : vids_r;
 					vids_i[imin] = *vids_i.Last(), vids_i.SetCount(vids_i.Count()-1);
 					vtx[N-1] = pts[idx[N-1]];
+					// Simplexを追加
+					for (int j = 0; j < N; ++j) simplexes.Append(idx[j]);
 				}
-				// Simplexを追加
-				for (int j = 0; j < N; ++j) simplexes.Append(idx[j]);
 			}
 
 			int wall_dim_c = (wall_dim + 1) % 2;
