@@ -416,7 +416,19 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 	return true;
 }
 
-bool ONGEO_DelaunayTriangulation_DeWall(const ON_2dPoint *pts, int num_pts, ON_SimpleArray<int> &simplexes){
-	PROF("DelaunayTriangulation_DeWall");
+bool ONGEO_DelaunayTriangulation_2D_DeWall(const ON_2dPoint *pts, int num_pts, ON_SimpleArray<int> &simplexes){
+	PROF("DelaunayTriangulation_2D_DeWall(ON_2dPoint)");
 	return DelaunayTriangulation_DeWall<3, const ON_2dPoint *>(pts, num_pts, simplexes);
+}
+
+bool ONGEO_DelaunayTriangulation_2D_DeWall(const double *pts, int num_pts, ON_SimpleArray<int> &simplexes){
+	PROF("DelaunayTriangulation_2D_DeWall(double array)");
+	struct Access{
+		const double *pts;
+		Access(const double *pts_) : pts(pts_){}
+		ON_2dPoint operator [](int idx) const{
+			return ON_2dPoint(pts + idx * 2);
+		}
+	}ac(pts);
+	return DelaunayTriangulation_DeWall<3, const Access>(ac, num_pts, simplexes);
 }

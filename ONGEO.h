@@ -423,4 +423,5 @@ ONGEO_DECL void ONGEO_ReadLine(ON_BinaryArchive &ba, ON_String &str);
 ONGEO_DECL bool ONGEO_ReadTextSTL(ON_BinaryArchive &ba, ON_Mesh &mesh, ON_String &modelname);
 
 /// 与えられた点列から、DeWall法でドロネー三角形分割を施す
-ONGEO_DECL bool ONGEO_DelaunayTriangulation_DeWall(const ON_2dPoint *pts, int num_pts, ON_SimpleArray<int> &simplexes);
+ONGEO_DECL bool ONGEO_DelaunayTriangulation_2D_DeWall(const ON_2dPoint *pts, int num_pts, ON_SimpleArray<int> &simplexes);
+ONGEO_DECL bool ONGEO_DelaunayTriangulation_2D_DeWall(const double *pts, int num_pts, ON_SimpleArray<int> &simplexes);
