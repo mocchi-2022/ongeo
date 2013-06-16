@@ -14,6 +14,16 @@
 #define ONGEO_CLASS
 #define ONGEO_DECL
 #endif
+
+template <typename T> void ONGEO_Swap(ON_SimpleArray<T> &lhs, ON_SimpleArray<T> &rhs){
+	int sz_l[] = {lhs.Count(), lhs.Capacity()};
+	int sz_r[] = {rhs.Count(), rhs.Capacity()};
+	int *ka_l = lhs.KeepArray();
+	int *ka_r = rhs.KeepArray();
+	lhs.SetArray(ka_r, sz_r[0], sz_r[1]);
+	rhs.SetArray(ka_l, sz_l[0], sz_l[1]);
+}
+
 /// クエリ点に最も近い有理Bezier曲線上の点を求める(BBClippingよりも高速)。
 /// @param [in] bcs ベジエ曲線の配列の先頭要素のポインタ
 /// @param [in] num_bcs ベジエ曲線の数
@@ -411,3 +421,6 @@ ONGEO_DECL void ONGEO_ReadLine(ON_BinaryArchive &ba, ON_String &str);
 
 /// テキストSTLを読み込み、ON_Meshに格納する
 ONGEO_DECL bool ONGEO_ReadTextSTL(ON_BinaryArchive &ba, ON_Mesh &mesh, ON_String &modelname);
+
+/// 与えられた点列から、DeWall法でドロネー三角形分割を施す
+ONGEO_DECL bool ONGEO_DelaunayTriangulation_DeWall(const ON_2dPoint *pts, int num_pts, ON_SimpleArray<int> &simplexes);

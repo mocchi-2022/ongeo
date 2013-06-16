@@ -37,7 +37,7 @@ void ONGEO_ReadLine(ON_BinaryArchive &ba, ON_String &str){
 		size_t cp = ba.CurrentPosition();
 		if (!ba.ReadChar(100, buf)){
 			bs = ba.CurrentPosition() - cp;
-			ba.SeekFromCurrentPosition(-bs);
+			ba.SeekFromCurrentPosition(-static_cast<int>(bs));
 			ba.ReadChar(bs, buf);
 		}
 		for (size_t i = 0; i < bs; ++i){
