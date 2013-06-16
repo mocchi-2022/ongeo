@@ -32,8 +32,8 @@ template <int D> struct Region{
 			}
 		}
 		bool operator <(const Face &rhs) const{
-			for (int i = 0; i < D-1; ++i) if (fids[i] < rhs.fids[i]) return true;
-			return false;
+			for (int i = 0; i < D-1; ++i) if (fids[i] >= rhs.fids[i]) return false;
+			return true;
 		}
 	};
 	void Arrange(Face &f);
