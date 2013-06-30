@@ -32,6 +32,10 @@ template <> struct traits<3>{
 		static int fii[3][2] = {{0, 1}, {0, 2}, {1, 2}};
 		return fii[j][i];
 	}
+	static int PII(int i){
+		static int pii[3] = {2, 1, 0};
+		return pii[i];
+	}
 	template<typename Ary, typename T>
 	static void MakeFirstSimplex(const T &ptA, const T &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[1]){
 		// 外接円の半径が最小になる点の検出
@@ -57,6 +61,10 @@ template <> struct traits<4>{
 	static int FII(int j, int i){
 		static int fii[4][3] = {{0, 1, 2}, {0, 1, 3}, {0, 2, 3}, {1, 2, 3}};
 		return fii[j][i];
+	}
+	static int PII(int i){
+		static int pii[4] = {3, 2, 1, 0};
+		return pii[i];
 	}
 	template<typename T, typename Ary>
 	static void MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[2]){
@@ -122,9 +130,7 @@ double DelaunayDistance(Region<4>::Face &f, const ON_3dVector &nrm, ON_3dPoint &
 }
 
 template<typename T>
-void CalcFaceNormal(const T &pts, const Region<3>::Face &fs, int fidx, ON_2dVector &nrm){
-	static int vidx_iso[] = {2, 1, 0};
-	int vidx = vidx_iso[fidx];
+void CalcFaceNormal(const T &pts, const Region<3>::Face &fs, int vidx, ON_2dVector &nrm){
 	nrm.PerpendicularTo(pts[fs.fids[1]] - pts[fs.fids[0]]);
 	if (ON_DotProduct(nrm, pts[vidx] - pts[fs.fids[0]]) < 0) nrm *= -1;
 }
@@ -250,7 +256,7 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 						side = 0;
 						int fii;
 						for (int i = 0; i < N-1; ++i) fii = traits<N>::FII(j,i), f.fids[i] = idx[fii], side |= sii[fii];
-						CalcFaceNormal(pts, f, j, fo.AppendNew());
+						CalcFaceNormal(pts, f, idx[traits<N>::PII(j)], fo.AppendNew());
 						f.Arrange();
 					}
 
