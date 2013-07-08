@@ -37,7 +37,7 @@ template <> struct traits<3>{
 		return pii[i];
 	}
 	template<typename Ary, typename T>
-	static void MakeFirstSimplex(const T &ptA, const T &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[1]){
+	static void MakeFirstSimplex(const T &ptA, const T &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[3]){
 		// 外接円の半径が最小になる点の検出
 		int imin, side_min = -1;
 		double r_min = std::numeric_limits<double>::max();
@@ -45,6 +45,7 @@ template <> struct traits<3>{
 			ON_SimpleArray<int> &vids_i = (j == 0) ? vids_l : vids_r;
 			for (int i = 0; i < vids_i.Count(); ++i){
 				int index = vids_i[i];
+				if (idx[0] == index || idx[1] == index) continue;
 				ON_2dPoint pt = pts[index];
 				double r = ON_Circle(ptA, ptB, pt).radius;
 				if (r_min > r) r_min = r, idx[0] = index, imin = i, side_min = j;
@@ -67,7 +68,7 @@ template <> struct traits<4>{
 		return pii[i];
 	}
 	template<typename T, typename Ary>
-	static void MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[2]){
+	static void MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[4]){
 		traits<3>::MakeFirstSimplex<Ary, ON_Point>(ptA, ptB, vids_l, vids_r, pts, idx);
 		// Todo: idx[2]
 	}
@@ -203,7 +204,7 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 				}
 				vtx[1] = pts[idx[1]];
 
-				traits<N>::MakeFirstSimplex<T, traits<N>::ON_Point>(vtx[0], vtx[1], vids_l, vids_r, pts, idx + 2);
+				traits<N>::MakeFirstSimplex<T, traits<N>::ON_Point>(vtx[0], vtx[1], vids_l, vids_r, pts, idx);
 				for (int j = 2; j < N; ++j) vtx[j] = pts[idx[j]];
 
 				// Simplexを追加
