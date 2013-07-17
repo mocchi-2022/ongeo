@@ -70,6 +70,7 @@ struct ONGEO_IgesTo3dmInfo::Impl{
 
 	// ** Commit‚æ‚è‘O‚Ìˆ— **
 	void AddTempDEIndexToObject(ON_Object *obj, int idx){
+		if (!obj) return;
 		DEIndex *index = new DEIndex();
 		index->deidx = idx;
 		obj->AttachUserData(index);
@@ -351,6 +352,7 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				for (int h = 0; h < 4; ++h){
 					if (Token(igs, prm, index, token)) equation[h] = std::strtod(token, 0);
 				}
+				equation[3] *= -1;
 				int closed_crv = (Token(igs, prm, index, token)) ? DEPtr2Index(std::strtol(token, 0, 0)) : -1;
 				if (closed_crv >= 0 && !converted[closed_crv]){
 					stack.Append(ii); stack.Append(closed_crv);
@@ -582,10 +584,10 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 
 							ON_BrepLoop &l = brep->NewLoop(h ? l.inner : l.outer, f);
 							if (cs->m_c3){
-								ON_BrepVertex &v1 = brep->NewVertex(cs->m_c3->PointAtStart());
-								ON_BrepVertex &v2 = cs->m_c3->IsClosed() ? v1 : brep->NewVertex(cs->m_c3->PointAtEnd());
-								v1.m_tolerance = v2.m_tolerance = 0;
-								ON_BrepEdge &e = brep->NewEdge(v1, v2, brep->AddEdgeCurve(cs->m_c3->Duplicate()));
+								int v1 = brep->NewVertex(cs->m_c3->PointAtStart()).m_vertex_index;
+								int v2 = cs->m_c3->IsClosed() ? v1 : brep->NewVertex(cs->m_c3->PointAtEnd()).m_vertex_index;
+								brep->m_V[v1].m_tolerance = brep->m_V[v2].m_tolerance = 0;
+								ON_BrepEdge &e = brep->NewEdge(brep->m_V[v1], brep->m_V[v2], brep->AddEdgeCurve(cs->m_c3->Duplicate()));
 								e.m_tolerance = 0;
 								if (cs->m_c2){
 									ON_BrepTrim &t = brep->NewTrim(e, false, l, brep->AddTrimCurve(cs->m_c2->Duplicate()));
