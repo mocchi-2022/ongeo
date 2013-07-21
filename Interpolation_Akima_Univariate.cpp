@@ -168,3 +168,20 @@ double *ONGEO_Interpolation_Akima_Univariate::Evaluate(double x, double y[]){
 		return y;
 	}
 }
+
+ONGEO_DECL ONGEO_Interpolation_Akima_Univariate *ONGEO_Interpolation_Akima_Univariate_New(){
+	return new ONGEO_Interpolation_Akima_Univariate();
+}
+
+ONGEO_DECL void ONGEO_Interpolation_Akima_Univariate_Delete(ONGEO_Interpolation_Akima_Univariate *ths){
+	delete ths;
+}
+
+ONGEO_DECL bool ONGEO_Interpolation_Akima_Univariate_SetPoints(ONGEO_Interpolation_Akima_Univariate *ths, double *xa, double *ya, int num, int ydim){
+	if (!ths) return false;
+	return ths->SetPoints(xa, ya, num, ydim);
+}
+ONGEO_DECL double *ONGEO_Interpolation_Akima_Univariate_Evaluate(ONGEO_Interpolation_Akima_Univariate *ths, double x, double y[]){
+	if (!ths) return 0;
+	return ths->Evaluate(x, y);
+}

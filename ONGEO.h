@@ -307,6 +307,31 @@ ONGEO_DECL int ONGEO_Polynomial_CalcBinomialCoef(int m, int n);
 /// @return 根となる値
 ONGEO_DECL double ONGEO_Polynomial_FindRootByBrentMethod(double ti1, double ti2, const double *coef, int num, double tolerance);
 
+/// 一変数の秋間補間法により補間値を求めるクラス
+struct ONGEO_CLASS ONGEO_Interpolation_Akima_Univariate{
+	struct Impl;
+	Impl *pimpl;
+
+	ONGEO_Interpolation_Akima_Univariate();
+	~ONGEO_Interpolation_Akima_Univariate();
+
+	/// 通過点列をセットする。xは必ず昇順であること。
+	bool SetPoints(double *xa, double *ya, int num, int ydim = 1);
+
+	/// xからyの補間値を求める。 y配列は呼び出し元で、ydim分だけ確保すること。
+	/// 入力されたyをそのまま戻り値とする。
+	double *Evaluate(double x, double y[]);
+
+private:
+	ONGEO_Interpolation_Akima_Univariate(const ONGEO_Interpolation_Akima_Univariate &);
+	ONGEO_Interpolation_Akima_Univariate &operator =(const ONGEO_Interpolation_Akima_Univariate &);
+};
+
+ONGEO_DECL ONGEO_Interpolation_Akima_Univariate *ONGEO_Interpolation_Akima_Univariate_New();
+ONGEO_DECL void ONGEO_Interpolation_Akima_Univariate_Delete(ONGEO_Interpolation_Akima_Univariate *);
+ONGEO_DECL bool ONGEO_Interpolation_Akima_Univariate_SetPoints(ONGEO_Interpolation_Akima_Univariate *ths, double *xa, double *ya, int num, int ydim = 1);
+ONGEO_DECL double *ONGEO_Interpolation_Akima_Univariate_Evaluate(ONGEO_Interpolation_Akima_Univariate *ths, double x, double y[]);
+
 /// IGESデータを扱うクラス
 struct ONGEO_CLASS ONGEO_IgesModel{
 	ON_String ss;
