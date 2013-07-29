@@ -255,9 +255,9 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 			if (de.entity_type == 100){
 				static ON_ArcCurve prt_arc;
 				ON_ArcCurve *arc = prt_arc.Duplicate();
-				ON_Plane pln(ON_3dPoint(0,0,0), ON_3dPoint(1,0,0), ON_3dPoint(0,1,0));
 				ON_2dPoint pt[2];
 				double dx[2] = {0}, dy[2] = {0};
+				ON_Plane pln(ON_3dPoint(0,0,0), ON_3dPoint(1,0,0), ON_3dPoint(0,1,0));
 				if (Token(igs, prm, index, token)) pln.origin.z = std::strtod(token, 0);
 				if (Token(igs, prm, index, token)) pln.origin.x = std::strtod(token, 0);
 				if (Token(igs, prm, index, token)) pln.origin.y = std::strtod(token, 0);
@@ -268,8 +268,17 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 					dy[h] = pt[h].y - pln.origin.y;
 				}
 				double radius = std::sqrt(dx[0] * dx[0] + dy[0] * dy[0]);
-				ON_Interval angles(std::atan2(dy[0], dx[0]), std::atan2(dy[1], dx[1]));
-				if (angles.IsDecreasing()) angles.m_t[0] -= ON_PI * 2.0;
+				ON_Interval angles;
+				if ((pt[1]-pt[0]).LengthSquared() < ON_ZERO_TOLERANCE){
+					ON_2dVector v0 = pt[0] - ON_2dVector(pln.origin.x, pln.origin.y);
+					pln.xaxis = v0, pln.xaxis.Unitize();
+					pln.yaxis.Set(-v0.y, v0.x, 0);
+					arc->m_arc.Create(ON_Circle(pln, radius), 2.0 * ON_PI);
+					angles.Set(0, 2.0 * ON_PI);
+				}else{
+					angles.Set(std::atan2(dy[0], dx[0]), std::atan2(dy[1], dx[1]));
+					if (angles.IsDecreasing()) angles.m_t[0] -= 2.0 * ON_PI;
+				}
 				arc->m_arc.Create(ON_Circle(pln, radius), angles);
 				if (xform) arc->Transform(*xform);
 				obj = arc;
