@@ -270,9 +270,9 @@ bool ONGEO_IgesTo3dm(const ONGEO_IgesModel &igs, ONX_Model &onx, ONGEO_IgesTo3dm
 				double radius = std::sqrt(dx[0] * dx[0] + dy[0] * dy[0]);
 				ON_Interval angles;
 				if ((pt[1]-pt[0]).LengthSquared() < ON_ZERO_TOLERANCE){
-					ON_2dVector v0 = pt[0] - ON_2dVector(pln.origin.x, pln.origin.y);
-					pln.xaxis = v0, pln.xaxis.Unitize();
-					pln.yaxis.Set(-v0.y, v0.x, 0);
+					pln.xaxis = (pt[0] - ON_2dVector(pln.origin.x, pln.origin.y)) / radius;
+					pln.yaxis.Set(-pln.xaxis.y, pln.xaxis.x, 0);
+					pln.UpdateEquation();
 					arc->m_arc.Create(ON_Circle(pln, radius), 2.0 * ON_PI);
 					angles.Set(0, 2.0 * ON_PI);
 				}else{
