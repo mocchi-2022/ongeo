@@ -90,6 +90,7 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 		pw = p11, p11 = p21, p21 = pw;
 		pw = p12, p12 = p22, p22 = pw;
 		du = p12 - p11, dv *= -1;
+		dul2 = du.LengthSquared();
 		if (dul2 < tole_z2){
 			// 面とZeroPointの線が平行
 			return 1;
@@ -100,6 +101,7 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 		pw = p11, p11 = p12, p12 = pw;
 		pw = p21, p21 = p22, p22 = pw;
 		du *= -1, dv = p21 - p11;
+		dvl2 = du.LengthSquared();
 		if (dvl2 < tole_z2){
 			// 面とZeroPointの線が平行
 			return 1;
@@ -168,7 +170,8 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 		if (inv_u) u[0] = 1 - u[0], u[1] = 1 - u[1];
 		if (inv_v) v[0] = 1 - v[0], v[1] = 1 - v[1];
 	}
-	double margin = err2 ? std::sqrt(err2 / (dul2 + dvl2)) : 0;
+//	double margin = err2 ? std::sqrt(err2 / (dul2 + dvl2)) : 0;
+	double margin = 0.25;
 
 	if (u[0] >= -margin && u[0] <= 1+margin && v[0] >= -margin && v[0] <= 1+margin) inrange |= 1;
 	if (u[1] >= -margin && u[1] <= 1+margin && v[1] >= -margin && v[1] <= 1+margin) inrange |= 2;
