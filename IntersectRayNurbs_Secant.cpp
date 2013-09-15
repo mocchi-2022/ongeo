@@ -6,7 +6,7 @@
 #include <cmath>
 #include <algorithm>
 
-bool ONGEO_IntersectRayNurbs_Secant(const ON_3dRay &ray, const ON_NurbsSurface &srf, const ON_2dPoint &uv0, const ON_2dPoint &uv1, ON_3dPoint &tuv, double tolerance, int max_iter){
+bool ONGEO_IntersectRayNurbs_Secant(const ON_3dRay &ray, const ON_NurbsSurface &srf, const ON_2dPoint &uv0, const ON_2dPoint &uv1, ON_3dPoint &tuv, ON_3dPoint &ptsrf, ON_3dPoint &ptlin, double tolerance, int max_iter){
 	double tol2 = tolerance * tolerance;
 	ON_2dPoint uv[3] = {uv1, uv0, ON_2dPoint()};
 	for(int i = 0; i < max_iter; ++i){
@@ -33,8 +33,9 @@ bool ONGEO_IntersectRayNurbs_Secant(const ON_3dRay &ray, const ON_NurbsSurface &
 			if (!srf.Domain(0).Includes(uv[1].x) || !srf.Domain(1).Includes(uv[1].y)){
 				return false;
 			}
-			ON_3dVector dt = ptint - ray.m_P;
 			tuv.y = uv[1].x, tuv.z = uv[1].y;
+			ptsrf = pt;
+			ptlin = ptint;
 			return true;
 		}
 

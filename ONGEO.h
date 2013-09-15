@@ -223,7 +223,7 @@ ONGEO_DECL int ONGEO_SphereTree_GetNurbsIndexFromBezIndex(const ONGEO_SphereTree
 ONGEO_DECL int ONGEO_SphereTree_GetFirstBezIndexFromBezIndex(const ONGEO_SphereTree *, int bez_index);
 ONGEO_DECL int ONGEO_SphereTree_GetNurbsIntervalFromBezIndex(const ONGEO_SphereTree *, const ON_NurbsSurface *nbsurfs, int bez_index, ON_Interval range[2]);
 
-ONGEO_DECL bool ONGEO_IntersectRayNurbs_Secant(const ON_3dRay &ray, const ON_NurbsSurface &srf, const ON_2dPoint &uv0, const ON_2dPoint &uv1, ON_3dPoint &tuv, double tolerance, int max_iter = 50);
+ONGEO_DECL bool ONGEO_IntersectRayNurbs_Secant(const ON_3dRay &ray, const ON_NurbsSurface &srf, const ON_2dPoint &uv0, const ON_2dPoint &uv1, ON_3dPoint &tuv, ON_3dPoint &ptsrf, ON_3dPoint &ptlin, double tolerance, int max_iter = 50);
 
 /// 多項式関数に値を代入して計算する。
 /// @param [in] t 代入する値
