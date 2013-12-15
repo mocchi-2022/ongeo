@@ -26,7 +26,7 @@ ONGEO_BrepsRayIntersect::ONGEO_BrepsRayIntersect(const ON_Brep **breps, int num_
 			nbsurf.Trim(1, ON_Interval(bb.m_min.y, bb.m_max.y));
 		}
 	}
-	st = ONGEO_NewSphereTree(nbsurfs.Count(), &nbsurfs[0]);
+	st = ONGEO_NewSphereTree(nbsurfs.Count(), nbsurfs.First());
 	st->CreateTree(0, 1.02, -1);
 }
 
