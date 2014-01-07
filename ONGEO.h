@@ -206,6 +206,16 @@ ONGEO_DECL void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_ClassArray<ON_B
 /// @return true:uv点はループの中、false:uv点はループの外
 ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance);
 
+/// UVカーブを示すベジエ曲線群から、uv点の内外判定を実施する。uv点がベジエ曲線上に乗っている場合は、指示したUVベクトルの向きで内外を判定する。
+/// @param [in] loop_crvs LoopのUVカーブ群
+/// @param [in] num_crvs_in_a_loop 各Loopが何個のBezierUVカーブを持っているか
+/// @param [in] uv uv点
+/// @param [in] uvdir uvベクトル
+/// @param [in] tol_np 最短点計算トレランス
+/// @param [in] tol_oncrv 曲線上判定トレランス
+/// @return true:uv点はループの中、false:uv点はループの外
+ONGEO_DECL bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, const ON_2dVector &uvdir, double tol_np, double tol_oncrv);
+
 /// UVカーブを示す折れ線群から、uv点の内外判定を実施する。
 /// @param [in] loop_pols LoopのUVカーブとなる折れ線群
 /// @param [in] num_loop_pols 閉じた折れ線の数

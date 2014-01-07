@@ -28,26 +28,41 @@ void ONGEO_GetBezierLoops(const ON_BrepFace &face, ON_ClassArray<ON_BezierCurve>
 	}
 }
 
-bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance){
-	double t;
-	const ON_BezierCurve *bcn;
-	ON_3dPoint pt, ptdmy;
-	double dist = ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(loop_crvs.First(), loop_crvs.Count(), tolerance, ON_3dPoint(uv), bcn, t, pt);
-	ON_3dVector dir_t, dir_tf, dir_tp;
-	bcn->EvTangent(t, pt, dir_t);
-	if (t <= ON_ZERO_TOLERANCE){
-		const ON_BezierCurve *bcn_fwd = (bcn != loop_crvs.First()) ? bcn - 1 : bcn + loop_crvs.Count() - 1;
-		bcn_fwd->EvTangent(1.0, ptdmy, dir_tf);
-		dir_t.Unitize(), dir_tf.Unitize();
-		dir_t += dir_tf;
-	}else if(t >= 1 - ON_ZERO_TOLERANCE){
-		const ON_BezierCurve *bcn_prev = (bcn != loop_crvs.First() + loop_crvs.Count() - 1) ? bcn + 1 : loop_crvs.First();
-		bcn_prev->EvTangent(1.0, ptdmy, dir_tp);
-		dir_t.Unitize(), dir_tp.Unitize();
-		dir_t += dir_tp;
+namespace {
+	void CalculateUVNormalFromPoint(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance, ON_2dVector &dir_crv, ON_2dVector &dir_tocrv){
+		double t;
+		const ON_BezierCurve *bcn;
+		ON_3dPoint pt, ptdmy;
+		double dist = ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(loop_crvs.First(), loop_crvs.Count(), tolerance, ON_3dPoint(uv), bcn, t, pt);
+		ON_3dVector dir_t, dir_tf, dir_tp;
+		bcn->EvTangent(t, pt, dir_t);
+		dir_crv = dir_t;
+		if (t <= ON_ZERO_TOLERANCE){
+			const ON_BezierCurve *bcn_fwd = (bcn != loop_crvs.First()) ? bcn - 1 : bcn + loop_crvs.Count() - 1;
+			bcn_fwd->EvTangent(1.0, ptdmy, dir_tf);
+			dir_crv.Unitize(), dir_tf.Unitize();
+			dir_crv += dir_tf;
+		}else if(t >= 1 - ON_ZERO_TOLERANCE){
+			const ON_BezierCurve *bcn_prev = (bcn != loop_crvs.First() + loop_crvs.Count() - 1) ? bcn + 1 : loop_crvs.First();
+			bcn_prev->EvTangent(1.0, ptdmy, dir_tp);
+			dir_crv.Unitize(), dir_tp.Unitize();
+			dir_crv += dir_tp;
+		}
+		dir_tocrv = ON_2dPoint(pt) - uv;
 	}
-	ON_2dVector dir_ct = ON_2dPoint(pt) - uv;
-	return (dir_ct.Length() < tolerance || ON_CrossProduct(dir_ct, ON_2dVector(dir_t))[2] >= 0);
+}
+
+bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, double tolerance){
+	ON_2dVector dir_t, dir_ct;
+	CalculateUVNormalFromPoint(loop_crvs, num_crvs_in_a_loop, uv, tolerance, dir_t, dir_ct);
+	return (dir_ct.Length() < tolerance || ON_CrossProduct(dir_ct, dir_t)[2] >= 0);
+}
+
+bool ONGEO_UVPointIsInside(const ON_ClassArray<ON_BezierCurve> &loop_crvs, const ON_SimpleArray<int> &num_crvs_in_a_loop, const ON_2dPoint &uv, const ON_2dVector &uvdir, double tol_np, double tol_oncrv){
+	ON_2dVector dir_t, dir_ct;
+	CalculateUVNormalFromPoint(loop_crvs, num_crvs_in_a_loop, uv, tol_np, dir_t, dir_ct);
+	if (dir_ct.Length() < tol_oncrv) return (ON_CrossProduct(dir_ct, uvdir)[2] <= 0);
+	return ON_CrossProduct(dir_ct, dir_t)[2] >= 0;
 }
 
 bool ONGEO_UVPointIsInside(const ON_Polyline *loop_pols, int num_loop_pols, const ON_2dPoint &uv, double tolerance){
