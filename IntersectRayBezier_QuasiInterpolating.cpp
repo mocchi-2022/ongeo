@@ -25,6 +25,8 @@
 #define DPRINTF(X, ...) 
 #endif
 
+#define ZT2 (ON_ZERO_TOLERANCE * ON_ZERO_TOLERANCE)
+
 namespace {
 inline double GetZInf(int dim){
 	PROF("GetZInf");
@@ -423,6 +425,7 @@ template <typename T> int IntersectRayBezier_QuasiInterpolating_(const ON_3dRay 
 			bez_t.Trim(1, intv);
 		}
 		double err = GetError<T>(bez_t), err2 = err * err;
+		if (err2 < ZT2) err2 = ZT2;
 		GetQuasiInterpControlPoints(bez_t, qicp);
 #ifdef DEBUGOUT
 		double wmax, wmin;
