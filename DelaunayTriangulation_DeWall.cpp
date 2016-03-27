@@ -48,7 +48,7 @@ template <> struct traits<3>{
 				if (idx[0] == index || idx[1] == index) continue;
 				ON_2dPoint pt = pts[index];
 				double r = ON_Circle(ptA, ptB, pt).radius;
-				if (r_min > r) r_min = r, idx[0] = index, imin = i, side_min = j;
+				if (r_min > r) r_min = r, idx[2] = index, imin = i, side_min = j;
 			}
 		}
 		if (side_min < 0) return;
