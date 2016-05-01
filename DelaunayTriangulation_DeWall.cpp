@@ -17,6 +17,7 @@
 #include <complex>
 #include <limits>
 #include <map>
+#include <algorithm>
 
 #include "ONGEO.h"
 #include "Profile.h"
@@ -25,6 +26,12 @@
 template <int N> struct traits{
 };
 
+struct Item{
+	double dist2; int id;
+	bool operator <(const Item &rhs){
+		return dist2 < rhs.dist2;
+	}
+};
 template <> struct traits<3>{
 	typedef ON_2dPoint ON_Point;
 	typedef ON_2dVector ON_Vector;
@@ -36,22 +43,54 @@ template <> struct traits<3>{
 		static int pii[3] = {2, 1, 0};
 		return pii[i];
 	}
+	struct ItemR{
+		double radius2; ON_2dPoint center; int id;
+		bool operator <(const ItemR &rhs){
+			return radius2 < rhs.radius2;
+		}
+	};
 	template<typename Ary, typename T>
-	static void MakeFirstSimplex(const T &ptA, const T &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[3]){
-		// 外接円の半径が最小になる点の検出
-		int imin, side_min = -1;
-		double r_min = std::numeric_limits<double>::max();
+	static bool MakeFirstSimplex(const T &ptA, const T &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[3]){
+		// ptA、ptB、残りの[vids_l ∪ vids_r]の各点を通る円の半径が小さい順に並べる。
+		ON_SimpleArray<ItemR> rad2ids;
 		for (int j = 0; j < 2; ++j){
 			ON_SimpleArray<int> &vids_i = (j == 0) ? vids_l : vids_r;
 			for (int i = 0; i < vids_i.Count(); ++i){
 				int index = vids_i[i];
 				if (idx[0] == index || idx[1] == index) continue;
-				ON_2dPoint pt = pts[index];
-				double r = ON_Circle(ptA, ptB, pt).radius;
-				if (r_min > r) r_min = r, idx[2] = index, imin = i, side_min = j;
+				ON_Circle cir(ptA, ptB, pts[index]);
+				ItemR &itm = rad2ids.AppendNew();
+				itm.radius2 = cir.radius * cir.radius;
+				itm.center = cir.Center();
+				itm.id = index;
 			}
 		}
-		if (side_min < 0) return;
+		if (rad2ids.Count() == 0) return false;
+
+		std::sort(rad2ids.First(), rad2ids.Last()+1);
+		// 半径が小さいものから順に、他の点が円の中に入っているかどうかを確認する。
+		// 一つも入っていないものを採用する。
+		for (int k = 0; k < rad2ids.Count(); ++k){
+			bool contains = false;
+			for (int j = 0; j < 2; ++j){
+				ON_SimpleArray<int> &vids_i = (j == 0) ? vids_l : vids_r;
+				for (int i = 0; i < vids_i.Count(); ++i){
+					int index = vids_i[i];
+					ItemR &itm = rad2ids[k];
+					if (idx[0] == index || idx[1] == index || itm.id == index) continue;
+					if (itm.radius2 > (pts[vids_i[i]] - itm.center).LengthSquared()){
+						contains = true;
+						break;
+					}
+				}
+				if (contains) break;
+			}
+			if (!contains){
+				idx[2] = rad2ids[k].id;
+				return true;
+			}
+		}
+		return false;
 	}
 
 };
@@ -68,7 +107,7 @@ template <> struct traits<4>{
 		return pii[i];
 	}
 	template<typename T, typename Ary>
-	static void MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[4]){
+	static bool MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[4]){
 		traits<3>::MakeFirstSimplex<Ary, ON_Point>(ptA, ptB, vids_l, vids_r, pts, idx);
 		// Todo: idx[2]
 	}
@@ -193,18 +232,33 @@ bool DelaunayTriangulation_DeWall(T &pts, int num_pts, ON_SimpleArray<int> &simp
 			// Make_FirstSimplex
 			if (region_c.fids.size() == 0){
 				add_simplex = true;
-				int imin;
 				// 反対側でidx_minに最も近い点の検出
 				ON_SimpleArray<int> &vids_opposite = (side_min == 0) ? vids_r : vids_l;
 				double dist2_min = std::numeric_limits<double>::max();
+#if 0
 				for (int i = 0; i < vids_opposite.Count(); ++i){
 					int index = vids_opposite[i];
 					double dist2 = (pts[index]-vtx[0]).LengthSquared();
 					if (dist2_min > dist2) dist2_min = dist2, idx[1] = index, imin = i;
 				}
 				vtx[1] = pts[idx[1]];
-
 				traits<N>::MakeFirstSimplex<T, traits<N>::ON_Point>(vtx[0], vtx[1], vids_l, vids_r, pts, idx);
+#else
+				ON_SimpleArray<Item> minidx;
+				for (int i = 0; i < vids_opposite.Count(); ++i){
+					Item &itm = minidx.AppendNew();
+					itm.id = vids_opposite[i];
+					itm.dist2 = (pts[itm.id]-vtx[0]).LengthSquared();
+				}
+				std::sort(minidx.First(), minidx.Last()+1);
+				for(int i = 0; i < minidx.Count(); ++i){
+					idx[1] = minidx[i].id;
+					vtx[1] = pts[idx[1]];
+					if (traits<N>::MakeFirstSimplex<T, traits<N>::ON_Point>(vtx[0], vtx[1], vids_l, vids_r, pts, idx)){
+						break;
+					}
+				}
+#endif
 				for (int j = 2; j < N; ++j) vtx[j] = pts[idx[j]];
 
 				// Simplexを追加
