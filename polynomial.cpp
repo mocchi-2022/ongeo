@@ -105,6 +105,74 @@ bool ONGEO_Polynomial_Subtract(const double *coef1, int num1, const double *coef
 	return true;
 }
 
+/// 多項式の除算をし、商と剰余求める。
+/// @param [in] coef1 割られる多項式の係数列
+/// @param [in] num1 割られる多項式の係数の個数(=次数+1)
+/// @param [in] coef2 割る多項式の係数列
+/// @param [in] num2 割る多項式の係数の個数(=次数+1)
+/// @param [out] coef_quot 商多項式の係数列
+/// @param [out] num_quot 商多項式の係数の個数 (num_quot >= num1 - num2 + 1であること)
+/// @param [out] coef_rem 剰余多項式の係数列
+/// @param [out] num_rem 剰余多項式の係数の個数 (num_rem >= num1 - 1 であること)
+void ONGEO_Polynomial_Divide(const double *coef1, int num1, const double *coef2, int num2, double *coef_quot, int num_quot, double *coef_rem, int num_rem){
+	if (num_quot <= 0 || num_rem <= 0) return;
+	while(num1){
+		if (std::abs(*coef1) <= std::numeric_limits<double>::epsilon()) --num1, ++coef1;
+		else break;
+	}
+	while(num2){
+		if (std::abs(*coef2) <= std::numeric_limits<double>::epsilon()) --num2, ++coef2;
+		else break;
+	}
+	if (num2 == 0){
+		if (coef_quot) coef_quot[0] = std::numeric_limits<double>::infinity();
+		coef_rem[0] = std::numeric_limits<double>::infinity(); return;
+	}
+	// 剰余係数列に一回割られる係数列を入れられるだけ入れる。
+	// 剰余係数列で、割られる係数列から商係数x割る係数列を引き算し続ける処理をする際、
+	// 最初の商係数x割る係数列よりも下の桁は変わらないため、先に書いておく。
+	//
+	//                        3x^3
+	//       2x^2 + 3x + 2 )~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//                        6x^5 - 2x^4        + x^2      - 5
+	//                        6x^5 + 9x^4 + 6x^3
+	//                       -----------------------------------
+	//                             -11x^4 - 6x^3 + x^2      - 5
+	//                                             ~~~~~~~~~~~~ ←ここのこと
+	// 
+
+	const double *c1_t = coef1 + num1 - 1;
+	double *cr_t = coef_rem + num_rem - 1;
+	while(cr_t >= coef_rem && c1_t >= coef1) *cr_t = *c1_t, --cr_t, --c1_t;
+	while(cr_t >= coef_rem) *cr_t = 0, --cr_t;
+
+	if (num1 >= num2){
+		int nq = num1 - num2 + 1, nr = num1 - 1;
+		double *cq = coef_quot ? coef_quot + (num_quot - nq) : 0;
+		double *cr = coef_rem + (num_rem - nr);
+		for (double *p = coef_quot; p < cq; ++p) *p = 0;
+		for (double *p = coef_rem; p < cr; ++p) *p = 0;
+
+		double q = coef1[0] / coef2[0];
+		if (cq) cq[0] = q;
+		for(int k = 0;;){
+			if (std::abs(q) > 0){
+				// 剰余の引き算処理
+				for (int j = 0; j < nr - k && j < num2 - 1; ++j){
+					cr[j+k] -= q * coef2[j+1];
+				}
+			}
+			++k;
+			if (k >= nq) break;
+			q = cr[k-1] / coef2[0];
+			cr[k-1] = 0;
+			if (cq) cq[k] = q;
+		}
+	}else{
+		if (coef_quot) for (int j = 0; j < num_quot; ++j) coef_quot[j] = 0;
+	}
+}
+
 // 多項式を一階微分する。
 // @param [in] coef 多項式の係数列
 // @param [in] num 多項式の係数の個数(=次数+1)
@@ -158,6 +226,7 @@ void ONGEO_Polynomial_CreateSturmSequence(const double *coef, int num, double *s
 
 	ONGEO_Polynomial_Differential(strum + max_nz * num, num, strum + (num * (1 + max_nz)) + 1);
 
+#if 0
 	for (int j = 2+max_nz, jj = (2+max_nz) * num; j < num; ++j, jj += num){
 		double qx = strum[j-2+jj-2*num] / strum[j-1+jj-num];
 		double qc = (strum[j-1+jj-2*num] - strum[j  +jj-num]*qx) / strum[j-1+jj-num];
@@ -173,6 +242,13 @@ void ONGEO_Polynomial_CreateSturmSequence(const double *coef, int num, double *s
 			j += num_zero - 2;
 		}
 	}
+#else
+	for (int j = 2+max_nz, jj = max_nz * num; j < num; ++j, jj += num){
+		int jjr = jj + num * 2;
+		ONGEO_Polynomial_Divide(strum + jj, num, strum + jj + num, num, 0, num, strum + jjr, num);
+		for (int i = 0; i < num; ++i) strum[jjr+i] *= -1.0;
+	}
+#endif
 }
 
 // Sturm列を用いて、指定した値での符号反転回数を計算する。

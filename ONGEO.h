@@ -271,6 +271,17 @@ ONGEO_DECL bool ONGEO_Polynomial_Subtract(const double *coef1, int num1, const d
 ///	([num1+num2-2]次の多項式となるため、入力側でnum1+num2-1個分の係数の領域を確保する必要がある。)
 ONGEO_DECL void ONGEO_Polynomial_Multiply(const double *coef1, int num1, const double *coef2, int num2, double *coef_mul);
 
+/// 多項式の除算をし、商と剰余求める。
+/// @param [in] coef1 割られる多項式の係数列
+/// @param [in] num1 割られる多項式の係数の個数(=次数+1)
+/// @param [in] coef2 割る多項式の係数列
+/// @param [in] num2 割る多項式の係数の個数(=次数+1)
+/// @param [out] coef_quot 商多項式の係数列 ... 剰余だけが必要な場合はヌルポインタを入れることができる
+/// @param [out] num_quot 商多項式の係数の個数 (num_quot >= num1 であること ... 最大次数は coef1の非ゼロ最大次数 - coef2の非ゼロ最大次数 であり、 num1 - num2 とは限らない)
+/// @param [out] coef_rem 剰余多項式の係数列
+/// @param [out] num_rem 剰余多項式の係数の個数 (num_rem >= num1 かつ num2 - 1であること)
+ONGEO_DECL void ONGEO_Polynomial_Divide(const double *coef1, int num1, const double *coef2, int num2, double *coef_quot, int num_quot, double *coef_rem, int num_rem);
+
 /// 多項式を一階微分する。
 /// @param [in] coef 多項式の係数列
 /// @param [in] num 多項式の係数の個数(=次数+1)
