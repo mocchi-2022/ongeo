@@ -11,9 +11,7 @@
 #include <string>
 #include <cstdio>
 
-// Reference : Yohan D.Fougerolle, Sandrine Lanquetin, Marc Neveu, and Thierry Lauthelier,
-//   "A Geometric Algorithm for Ray/Bezier Surfaces Intersection using Quasi-interpolating Control Net".
-//    Signal Image Technology and Internet Based Systems, 2008.
+#include "ONGEO_QuasiInterpolating.hpp"
 
 //#define DEBUGOUT
 
@@ -28,43 +26,11 @@
 #define ZT2 (ON_ZERO_TOLERANCE * ON_ZERO_TOLERANCE)
 
 namespace {
-inline double GetZInf(int dim){
-	PROF("GetZInf");
-	if (dim == 1) return 0;
-	if (dim == 2) return 0.0625; // 1/16
-	return static_cast<double>(((dim + 1) / 2) * (dim / 2))/(2.0*static_cast<double>(dim)) - 0.25;
-}
-
-template <typename T> struct PointDimTraits{
-};
-template <> struct PointDimTraits<ON_3dPoint>{
-	static const int DIM = 3;
-	static double GetErrFromErr2(const ON_BezierSurface &bez, double errmax2u, double errmax2v){
-		PROF("GetErrFromErr2<ON_3dPoint>");
-		return GetZInf(bez.m_order[0]-1) * std::sqrt(errmax2u) + GetZInf(bez.m_order[1]-1) * std::sqrt(errmax2v);
-	}
-};
-
-template <> struct PointDimTraits<ON_4dPoint>{
-	static const int DIM = 4;
-	static double GetErrFromErr2(const ON_BezierSurface &bez, double errmax2u, double errmax2v){
-		PROF("GetErrFromErr2<ON_4dPoint>");
-		double wmin = bez.Weight(0, 0);
-		for (int j = 0; j < bez.m_order[1]; ++j){
-			for (int i = 0; i < bez.m_order[0]; ++i){
-				if (wmin > bez.Weight(i, j)) wmin = bez.Weight(i, j);
-			}
-		}
-		return PointDimTraits<ON_3dPoint>::GetErrFromErr2(bez, errmax2u, errmax2v) / wmin;
-	}
-};
-
-
 template <typename T> void EvaluateBiLinearSurf(const ON_3dRay &ray, T cods[4], double u, double v, double &t, ON_3dPoint &ptsrf, ON_3dPoint &ptlin){
 	PROF("EvaluateBiLinearSurf");
 	T pt;
 	double uv = u * v;
-	for (int i = 0; i < PointDimTraits<T>::DIM; ++i){
+	for (int i = 0; i < ONGEO_QI_PointDimTraits<T, ON_BezierSurface>::DIM; ++i){
 		pt[i] = (cods[3][i] - cods[2][i] - cods[1][i] + cods[0][i]) * uv + (cods[1][i] - cods[0][i]) * u + (cods[2][i] - cods[0][i]) * v + cods[0][i];
 	}
 	ptsrf = pt;
@@ -181,48 +147,6 @@ int IntersectZeroPointBiLinear(const ON_2dPoint qicp2d[4], double u[2], double v
 	return 0;
 }
 
-inline void GetQuasiInterpCP(const ON_3dPoint &pp, const ON_3dPoint &pc, const ON_3dPoint &pn, ON_3dPoint &po){
-	po.x = (pp.x + pc.x * 2.0 + pn.x) * 0.25;
-	po.y = (pp.y + pc.y * 2.0 + pn.y) * 0.25;
-	po.z = (pp.z + pc.z * 2.0 + pn.z) * 0.25;
-}
-inline void GetQuasiInterpCP(const ON_4dPoint &pp, const ON_4dPoint &pc, const ON_4dPoint &pn, ON_4dPoint &po){
-	po.x = (pp.x + pc.x * 2.0 + pn.x) * 0.25;
-	po.y = (pp.y + pc.y * 2.0 + pn.y) * 0.25;
-	po.z = (pp.z + pc.z * 2.0 + pn.z) * 0.25;
-	po.w = (pp.w + pc.w * 2.0 + pn.w) * 0.25;
-}
-template <typename T> void GetQuasiInterpControlPoints(const ON_BezierSurface &bez, ON_SimpleArray<T> &qicp){
-	PROF("GetQuasiInterpControlPoints");
-	ON_SimpleArray<T> work_cp;
-    work_cp.SetCapacity(bez.m_order[0] * bez.m_order[1]);
-	work_cp.SetCount(work_cp.Capacity());
-	// U方向
-	ON_SimpleArray<T> work_u(bez.m_order[0]);
-	for (int j = 0, ji = 0; j < bez.m_order[1]; ++j, ji += bez.m_order[0]){
-		for (int i = 0; i < bez.m_order[0]; ++i){
-			bez.GetCV(i, j, work_u[i]);
-		}
-		for (int i = 1; i < bez.m_order[0]-1; ++i){
-			GetQuasiInterpCP(work_u[i-1], work_u[i], work_u[i+1], work_cp[ji+i]);
-		}
-		work_cp[ji] = work_u[0], work_cp[ji+bez.m_order[0]-1] = work_u[bez.m_order[0]-1];
-	}
-//	ON_SimpleArray<T> work_v(bez.m_order[1]);
-
-    qicp.SetCapacity(work_cp.Count());
-	qicp.SetCount(qicp.Capacity());
-	// V方向
-	for (int i = 0; i < bez.m_order[0]; ++i){
-		int j, ji;
-		for (j = 1, ji = bez.m_order[0]; j < bez.m_order[1]-1; ++j, ji += bez.m_order[0]){
-			GetQuasiInterpCP(work_cp[ji+i-bez.m_order[0]], work_cp[ji+i], work_cp[ji+i+bez.m_order[0]], qicp[ji+i]);
-		}
-		qicp[i] = work_cp[i], qicp[ji+i] = work_cp[ji+i];
-	}
-}
-
-
 void ProjectToRayPlane(const ON_Plane &rnPlane, const ON_SimpleArray<ON_3dPoint> &qicp, ON_2dPointArray &qicp2d){
 	PROF("ProjectToRayPlane<ON_3dPoint>");
 	qicp2d.SetCapacity(qicp.Count());
@@ -241,62 +165,7 @@ void ProjectToRayPlane(const ON_Plane &rnPlane, const ON_SimpleArray<ON_4dPoint>
 		qicp2d[i] *= qicp[i].w;
 	}
 }
-
-inline double GetDelta2LengthSquared(const ON_3dPoint &pp, const ON_3dPoint &pc, const ON_3dPoint &pn){
-	PROF("GetDelta2LengthSquared<ON_3dPoint>");
-	double d, dd = 0;
-	d = pp.x - pc.x * 2.0 + pn.x, d *= d, dd += d;
-	d = pp.y - pc.y * 2.0 + pn.y, d *= d, dd += d;
-	d = pp.z - pc.z * 2.0 + pn.z, d *= d, dd += d;
-	return dd;
-//	return ON_3dVector(pp - pc * 2.0 + pn).LengthSquared();
 }
-inline double GetDelta2LengthSquared(const ON_4dPoint &pp, const ON_4dPoint &pc, const ON_4dPoint &pn){
-	PROF("GetDelta2LengthSquared<ON_4dPoint>");
-	double d, dd = 0;
-	d = pp.x - pc.x * 2.0 + pn.x, d *= d, dd += d;
-	d = pp.y - pc.y * 2.0 + pn.y, d *= d, dd += d;
-	d = pp.z - pc.z * 2.0 + pn.z, d *= d, dd += d;
-	d = pp.w - pc.w * 2.0 + pn.w, d *= d, dd += d;
-	return dd;
-}
-
-inline void GetCVHomogeneous(const ON_BezierSurface &bez, int i, int j, ON_3dPoint &pt){
-	bez.GetCV(i, j, pt);
-}
-
-inline void GetCVHomogeneous(const ON_BezierSurface &bez, int i, int j, ON_4dPoint &pt){
-	bez.GetCV(i, j, ON::homogeneous_rational, pt);
-}
-
-template <typename T> double GetError(const ON_BezierSurface &bez){
-	PROF("GetError");
-	// U方向
-	double errmax2u = 0;
-	const int ord_u = bez.m_order[0], ord_v = bez.m_order[1];
-	ON_SimpleArray<T> cp(ord_u * ord_v);
-	for (int j = 0, ji = 0; j < ord_v; ++j, ji += ord_u){
-		for (int i = 0; i < ord_u; ++i){
-			GetCVHomogeneous(bez, i, j, cp[ji+i]);
-		}
-		for (int i = 1; i < ord_u-1; ++i){
-			double d = GetDelta2LengthSquared(cp[ji+i-1], cp[ji+i], cp[ji+i+1]);
-			if (errmax2u < d) errmax2u = d;
-		}
-	}
-	// V方向
-	double errmax2v = 0;
-	for (int i = 0; i < ord_u; ++i){
-		for (int j = 1, ji = ord_u; j < ord_v-1; ++j, ji += ord_u){
-			double d = GetDelta2LengthSquared(cp[ji-ord_u], cp[ji], cp[ji+ord_u]);
-			if (errmax2v < d) errmax2v = d;
-		}
-	}
-
-	return PointDimTraits<T>::GetErrFromErr2(bez, errmax2u, errmax2v);
-}
-}
-
 /// 0  : 線分に接していなく、かつ、閉じた領域の外
 /// 1  : 線分に接している、または閉じた領域の中
 __declspec(dllexport) int IntersectionTest(const ON_2dPointArray &qicp2d, int iu, int iv, int stride, double error2, double *err2_vertices){
@@ -424,9 +293,9 @@ template <typename T> int IntersectRayBezier_QuasiInterpolating_(const ON_3dRay 
 			bez_t.Trim(0, intu);
 			bez_t.Trim(1, intv);
 		}
-		double err = GetError<T>(bez_t), err2 = err * err;
+		double err = ONGEO_QI_GetError<T>(bez_t), err2 = err * err;
 		if (err2 < ZT2) err2 = ZT2;
-		GetQuasiInterpControlPoints(bez_t, qicp);
+		ONGEO_QI_GetQuasiInterpControlPoints(bez_t, qicp);
 #ifdef DEBUGOUT
 		double wmax, wmin;
 		ONGEO_CalculateMinMaxWeight(bez_t, wmin, wmax);

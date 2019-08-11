@@ -107,7 +107,7 @@ template <> struct traits<4>{
 		return pii[i];
 	}
 	template<typename T, typename Ary>
-	static bool MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[4]){
+	static void MakeFirstSimplex(const ON_3dPoint &ptA, const ON_3dPoint &ptB, ON_SimpleArray<int> &vids_l, ON_SimpleArray<int> &vids_r, const Ary &pts, int idx[4]){
 		traits<3>::MakeFirstSimplex<Ary, ON_Point>(ptA, ptB, vids_l, vids_r, pts, idx);
 		// Todo: idx[2]
 	}

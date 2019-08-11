@@ -94,10 +94,10 @@ bool ONGEO_UVPointIsInside(const ON_Polyline *loop_pols, int num_loop_pols, cons
 	double ti;
 	double tf = std::modf(t, &ti);
 	if (tf <= ON_ZERO_TOLERANCE){
-		dir_tf = loop_pol.TangentAt(t-0.5);
+		dir_tf = loop_pol.TangentAt(ti == 0 ? loop_pol.Count()-1.5 : t-0.5);
 		dir_t += dir_tf;
 	}else if(tf >= 1 - ON_ZERO_TOLERANCE){
-		dir_tp = loop_pol.TangentAt(t+0.5);
+		dir_tp = loop_pol.TangentAt(ti == loop_pol.Count()-1 ? 0.5 : t+0.5);
 		dir_t += dir_tp;
 	}
 	ON_2dVector dir_ct = ON_2dPoint(loop_pol.PointAt(t)) - uv;

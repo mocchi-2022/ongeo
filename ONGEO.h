@@ -18,11 +18,28 @@
 template <typename T> void ONGEO_Swap(ON_SimpleArray<T> &lhs, ON_SimpleArray<T> &rhs){
 	int sz_l[] = {lhs.Count(), lhs.Capacity()};
 	int sz_r[] = {rhs.Count(), rhs.Capacity()};
-	int *ka_l = lhs.KeepArray();
-	int *ka_r = rhs.KeepArray();
+	T *ka_l = lhs.KeepArray();
+	T *ka_r = rhs.KeepArray();
 	lhs.SetArray(ka_r, sz_r[0], sz_r[1]);
 	rhs.SetArray(ka_l, sz_l[0], sz_l[1]);
 }
+
+inline void ONGEO_GetCVHomogeneous(const ON_BezierSurface &bez, int i, int j, ON_3dPoint &pt){
+	bez.GetCV(i, j, pt);
+}
+
+inline void ONGEO_GetCVHomogeneous(const ON_BezierSurface &bez, int i, int j, ON_4dPoint &pt){
+	bez.GetCV(i, j, ON::homogeneous_rational, pt);
+}
+
+inline void ONGEO_GetCVHomogeneous(const ON_BezierCurve &bez, int i, ON_3dPoint &pt){
+	bez.GetCV(i, pt);
+}
+
+inline void ONGEO_GetCVHomogeneous(const ON_BezierCurve &bez, int i, ON_4dPoint &pt){
+	bez.GetCV(i, ON::homogeneous_rational, pt);
+}
+
 
 /// クエリ点に最も近い有理Bezier曲線上の点を求める(BBClippingよりも高速)。
 /// @param [in] bcs ベジエ曲線の配列の先頭要素のポインタ
@@ -45,6 +62,55 @@ ONGEO_DECL double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON
 /// @param [out] pt_nearest 最も近い点の三次元座標
 /// @return クエリ点と最近点との距離
 ONGEO_DECL double ONGEO_NearestPointBezierCurve_BBClipping(const ON_BezierCurve *bc_begin, const ON_BezierCurve *bc_end, double tolerance, const ON_3dPoint &pt_query, const ON_BezierCurve *&bc_nearest, double &t, ON_3dPoint &pt_nearest);
+
+/// 有理ベジエ曲線の曲線長を再分割による収束計算で求める(制御点列長と始点-終点距離の差がトレランス以下になるまで)。
+/// @param [in] bc ベジエ曲線
+/// @param [in] tolerance トレランス
+/// @return 曲線長
+ONGEO_DECL double ONGEO_LengthBezierCurve_SimpleSubdivision(const ON_BezierCurve &bc, double tolerance);
+
+/// 有理ベジエ曲線の曲線長を、引数で指定したパラメータで区間分割→数値積分で求める。
+/// @param [in] bc ベジエ曲線
+/// @param [in] 再分割パラメータ
+/// @param [out] estimate_deviation 推定誤差
+/// @return 曲線長
+ONGEO_DECL double ONGEO_LengthBezierCurve_NumericalIntegration(const ON_BezierCurve &bc, const double *subdivided_prms, int cnt, double *estimated_deviation = 0);
+
+/// 有理ベジエ曲線の曲線長を、引数で指定したパラメータで区間分割→適応求積法で求める。
+/// @param [in] bc ベジエ曲線
+/// @param [in] 再分割パラメータ
+/// @param [in] トレランス
+/// @param [out] estimate_deviation 推定誤差
+/// @return 曲線長
+ONGEO_DECL double ONGEO_LengthBezierCurve_AdaptiveQuadrate(const ON_BezierCurve &bc, const double *subdivided_prms, int cnt, double tolerance, double *estimated_deviation = 0);
+
+/// Nurbs曲線の曲線長と曲線パラメータを相互変換する。
+struct ONGEO_CLASS ONGEO_LengthParamNurbsCurve_AdaptiveQuadrate{
+	ON_NurbsCurve nc;
+
+	ON_SimpleArray<double> nc_prms;
+	ON_SimpleArray<double> nc_lengths;
+
+	double tolerance;
+	double estimated_deviation;
+
+	ONGEO_LengthParamNurbsCurve_AdaptiveQuadrate(const ON_NurbsCurve &nc, double tolerance);
+	double Length() const;
+	double ParamToLength(double nc_prm) const;
+	double LengthToParam(double nc_length) const;
+};
+
+/// 有理ベジエ曲線をテセレーションする(始点-終点を結ぶ線分と、各制御点との距離の最大値がトレランス以下になるまで)。
+/// @param [in] bc ベジエ曲線
+/// @param [in] tolerance トレランス
+/// @param [out] prms テセレーション結果を示すパラメータ配列
+ONGEO_DECL void ONGEO_TessellateBezierCurve_Simple(const ON_BezierCurve &bc, double tolerance, ON_SimpleArray<double> &prms);
+
+/// 有理ベジエ曲線をテセレーションする(Quasi-Interpolation Control Net を生成したときの、曲線との距離の最大値がトレランス以下になるまで)。
+/// @param [in] bc ベジエ曲線
+/// @param [in] tolerance トレランス
+/// @param [out] prms テセレーション結果を示すパラメータ配列
+ONGEO_DECL void ONGEO_TessellateBezierCurve_QuasiInterpolating(const ON_BezierCurve &bc, double tolerance, ON_SimpleArray<double> &prms);
 
 /// 半直線(ON_3dRay)と有理Bezier曲面との交点を求める。
 /// @param [in] ray 半直線
