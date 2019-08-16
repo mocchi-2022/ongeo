@@ -421,6 +421,37 @@ ONGEO_DECL void ONGEO_Interpolation_Akima_Univariate_Delete(ONGEO_Interpolation_
 ONGEO_DECL bool ONGEO_Interpolation_Akima_Univariate_SetPoints(ONGEO_Interpolation_Akima_Univariate *ths, double *xa, double *ya, int num, int ydim = 1);
 ONGEO_DECL double *ONGEO_Interpolation_Akima_Univariate_Evaluate(ONGEO_Interpolation_Akima_Univariate *ths, double x, double y[]);
 
+enum ONGEO_NI_ParameterMethod { // 曲線パラメータ [0 - 1] の計算方法
+	ONGEO_NI_EquallySpaced, // 等間隔に配置
+	ONGEO_NI_ChordLength,   // 制御点列の長さに合わせて配置、最も典型的な方法
+	ONGEO_NI_Centripetal    // 制御点列の長さの平方根に合わせて配置、急激な曲がりを含む場合はこちらの方が有利
+};
+enum ONGEO_NI_Solver{
+	ONGEO_NI_Solver_ON_Matrix_Inverse
+};
+
+/// 与えられた点列を通るNurbs曲線を作成する。
+/// @param [in]  pts     点列
+/// @param [in]  pt_cnt  点列の個数
+/// @param [in]  order   Nurbs曲線の階数
+/// @param [in]  pmethod 曲線パラメータの計算方法
+/// @param [put] nc      作成した Nurbs曲線
+/// @param [in]  solver  連立一次方程式をどの方法で解くか？
+/// @return true:成功、false:失敗
+ONGEO_DECL bool ONGEO_FitNurbsCurveToPointArray(const ON_3dPoint *pts, int pt_cnt, int order, ONGEO_NI_ParameterMethod pmethod, ON_NurbsCurve &nc, ONGEO_NI_Solver solver = ONGEO_NI_Solver_ON_Matrix_Inverse);
+
+/// 与えられた点グリッドを通るNurbs曲面を作成する。
+/// @param [in]  pts     点グリッド (P_u0v0、 P_u1v0、P_u2v0、...、P_u0v1、P_u1v1、... の順に並べる)
+/// @param [in]  u_count 点グリッドのU方向の個数
+/// @param [in]  u_count 点グリッドのV方向の個数
+/// @param [in]  u_order Nurbs曲面のU方向階数
+/// @param [in]  v_order Nurbs曲面のV方向階数
+/// @param [in]  pmethod 曲線パラメータの計算方法
+/// @param [put] nf      作成した Nurbs曲面
+/// @param [in]  solver  連立一次方程式をどの方法で解くか？
+/// @return true:成功、false:失敗
+ONGEO_DECL bool ONGEO_FitNurbsSurfaceToPointGrid(const ON_3dPoint *pts, int u_count, int v_count, int u_order, int v_order, ONGEO_NI_ParameterMethod pmethod, ON_NurbsSurface &nf, ONGEO_NI_Solver solver = ONGEO_NI_Solver_ON_Matrix_Inverse);
+
 /// IGESデータを扱うクラス
 struct ONGEO_CLASS ONGEO_IgesModel{
 	ON_String ss;
