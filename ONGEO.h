@@ -40,6 +40,13 @@ inline void ONGEO_GetCVHomogeneous(const ON_BezierCurve &bez, int i, ON_4dPoint 
 	bez.GetCV(i, ON::homogeneous_rational, pt);
 }
 
+/// Nurbs曲線のベジエ曲線への分割、およびベジエ曲線パラメータからNurbs曲線パラメータへの変換を行う。
+struct ONGEO_CLASS ONGEO_NurbsCurveBezierCache {
+	ON_ClassArray<ON_BezierCurve> bcs;
+	ON_SimpleArray<double> prms;
+	ONGEO_NurbsCurveBezierCache(const ON_NurbsCurve &nc);
+	double GetNurbsParameterFromBezierParameter(int bezier_idx, double bezier_t) const;
+};
 
 /// クエリ点に最も近い有理Bezier曲線上の点を求める(BBClippingよりも高速)。
 /// @param [in] bcs ベジエ曲線の配列の先頭要素のポインタ
@@ -51,6 +58,15 @@ inline void ONGEO_GetCVHomogeneous(const ON_BezierCurve &bez, int i, ON_4dPoint 
 /// @param [out] pt_nearest 最も近い点の三次元座標
 /// @return クエリ点と最近点との距離
 ONGEO_DECL double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurve *bcs, int num_bcs, double tolerance, const ON_3dPoint &pt_query, const ON_BezierCurve *&bc_nearest, double &t, ON_3dPoint &pt_nearest);
+
+/// クエリ点に最も近い有理Bezier曲線上の点を求める(BBClippingよりも高速)。
+/// @param [in] nbc_c ベジエ曲線配列を持つキャッシュデータ
+/// @param [in] tolerance 距離トレランス
+/// @param [in] pt_query クエリ点
+/// @param [out] nurbs_t 最も近い点の一に対応するNurbs曲線パラメータ値
+/// @param [out] pt_nearest 最も近い点の三次元座標
+/// @return クエリ点と最近点との距離
+ONGEO_DECL double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ONGEO_NurbsCurveBezierCache &nbc_c, double tolerance, const ON_3dPoint &pt_query, double &nurbs_t, ON_3dPoint &pt_nearest);
 
 /// 指定した点に最も近い有理Bezier曲線上の点を求める(速度が遅いため非推奨)。
 /// @param [in] bcs ベジエ曲線の配列の先頭要素のポインタ
@@ -126,6 +142,7 @@ ONGEO_DECL void ONGEO_CalculateMinMaxWeight(const ON_BezierSurface &src, double 
 
 /// ベジエ曲線群を包む正確なBoundingBoxを生成する。
 ONGEO_DECL int ONGEO_CalculateTightBoundingBox(const ON_BezierCurve *bcs, int num_bcs, double tolerance, ON_BoundingBox &bb);
+ONGEO_DECL int ONGEO_CalculateTightBoundingBox(const ONGEO_NurbsCurveBezierCache &nbc_c, double tolerance, ON_BoundingBox &bb);
 
 /// ベジエ曲面を包む大まかなBoundingSphereを生成する。
 ONGEO_DECL int ONGEO_CalculateRoughBoundingSphere(const ON_BezierSurface &src, ON_3dPoint &center, double &radius);

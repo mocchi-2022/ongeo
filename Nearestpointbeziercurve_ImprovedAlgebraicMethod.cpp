@@ -321,3 +321,16 @@ double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON_BezierCurv
 	}
 	return std::sqrt(dist2_min);
 }
+
+double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ONGEO_NurbsCurveBezierCache &nbc_c, double tolerance, const ON_3dPoint &pt_query, double &nurbs_t, ON_3dPoint &pt_nearest){
+	const ON_BezierCurve *bc_nearest = 0;
+	double bezier_t;
+	double dist = ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(nbc_c.bcs, nbc_c.bcs.Count(), tolerance, pt_query, bc_nearest, bezier_t, pt_nearest);
+	if (bc_nearest){
+		nurbs_t = nbc_c.GetNurbsParameterFromBezierParameter(static_cast<int>(bc_nearest - nbc_c.bcs.First()), bezier_t);
+	}else{
+		nurbs_t = ON_UNSET_VALUE;
+	}
+
+	return dist;
+}

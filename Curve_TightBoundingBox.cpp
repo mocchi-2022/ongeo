@@ -50,3 +50,6 @@ int ONGEO_CalculateTightBoundingBox(const ON_BezierCurve *bcs, int num_bcs, doub
 	return 0;
 }
 
+int ONGEO_CalculateTightBoundingBox(const ONGEO_NurbsCurveBezierCache &nbc_c, double tolerance, ON_BoundingBox &bb){
+	return ONGEO_CalculateTightBoundingBox(nbc_c.bcs, nbc_c.bcs.Count(), tolerance, bb);
+}
