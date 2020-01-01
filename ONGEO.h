@@ -79,6 +79,15 @@ ONGEO_DECL double ONGEO_NearestPointBezierCurve_ImprovedAlgebraicMethod(const ON
 /// @return クエリ点と最近点との距離
 ONGEO_DECL double ONGEO_NearestPointBezierCurve_BBClipping(const ON_BezierCurve *bc_begin, const ON_BezierCurve *bc_end, double tolerance, const ON_3dPoint &pt_query, const ON_BezierCurve *&bc_nearest, double &t, ON_3dPoint &pt_nearest);
 
+/// 指定した点に最も近いNurbs曲線上のパラメータをニュートン法による収束計算で求める。
+/// @param [in] nc       Nurbs曲線
+/// @param [in] pt_query クエリ点
+/// @param [in/out] t    クエリ点に近いNurbs曲線上に位置を与えると、クエリ点に最も近いNurbs曲線上の位置を返す。
+/// @param [in] range_   解が有りうる範囲を指定する。null_ptr を与えた場合は、曲線のパラメータ範囲全域を対象にする。
+/// @param [in] iteration_max 最も近い点の三次元座標
+/// @return true: 収束成功、 false: 収束失敗
+ONGEO_DECL bool ONGEO_NearestPointNurbsCurve_Newton(const ON_NurbsCurve &nc, const ON_3dPoint &pt_query, double &t, ON_Interval *range_ = 0, int iteration_max = 100000);
+
 /// 有理ベジエ曲線の曲線長を再分割による収束計算で求める(制御点列長と始点-終点距離の差がトレランス以下になるまで)。
 /// @param [in] bc ベジエ曲線
 /// @param [in] tolerance トレランス
@@ -452,10 +461,36 @@ enum ONGEO_NI_Solver{
 /// @param [in]  pt_cnt  点列の個数
 /// @param [in]  order   Nurbs曲線の階数
 /// @param [in]  pmethod 曲線パラメータの計算方法
-/// @param [put] nc      作成した Nurbs曲線
+/// @param [out] nc      作成した Nurbs曲線
 /// @param [in]  solver  連立一次方程式をどの方法で解くか？
 /// @return true:成功、false:失敗
 ONGEO_DECL bool ONGEO_FitNurbsCurveToPointArray(const ON_3dPoint *pts, int pt_cnt, int order, ONGEO_NI_ParameterMethod pmethod, ON_NurbsCurve &nc, ONGEO_NI_Solver solver = ONGEO_NI_Solver_ON_Matrix_Inverse);
+
+/// 与えられた点列から最小二乗法を用いて、指定した制御点数、階数の Nurbs曲線を作成する。
+/// @param [in]  pts     点列
+/// @param [in]  pt_cnt  点列の個数
+/// @param [in]  order   Nurbs曲線の階数
+/// @param [in]  cpt_cnt 制御点数
+/// @param [in]  pmethod 曲線パラメータの計算方法
+/// @param [out] nc      作成した Nurbs曲線
+/// @param [out] prm     各点を曲線に投影した際のパラメータ。呼び出し元で pt_cnt 分の領域を確保すること。null_ptr の時は格納しない。
+/// @param [out] err     各点と曲線との誤差。呼び出し元で pt_cnt 分の領域を確保すること。null_ptr の時は格納しない。
+/// @param [in]  solver  連立一次方程式をどの方法で解くか？
+/// @return 誤差の最大値
+ONGEO_DECL double ONGEO_FitNurbsCurveToPointArray_LeastSquare(const ON_3dPoint *pts, int pt_cnt, int order, int cpt_cnt, ONGEO_NI_ParameterMethod pmethod, ON_NurbsCurve &nc, double *prm = 0, double *err = 0, ONGEO_NI_Solver solver_id = ONGEO_NI_Solver_ON_Matrix_Inverse);
+
+#if 0
+/// 与えられた点列から、許容誤差 tolerance 以内を通るNurbs曲線を作成する。
+/// @param [in]  pts     点列
+/// @param [in]  pt_cnt  点列の個数
+/// @param [in]  order   Nurbs曲線の階数
+/// @param [in]  tolerance 許容誤差
+/// @param [in]  pmethod 曲線パラメータの計算方法
+/// @param [out] nc      作成した Nurbs曲線
+/// @param [in]  solver  連立一次方程式をどの方法で解くか？
+/// @return true:成功、false:失敗
+ONGEO_DECL bool ONGEO_FitNurbsCurveToPointArray(const ON_3dPoint *pts, int pt_cnt, int order, double tolerance, ONGEO_NI_ParameterMethod pmethod, ON_NurbsCurve &nc, ONGEO_NI_Solver solver = ONGEO_NI_Solver_ON_Matrix_Inverse);
+#endif
 
 /// 与えられた点グリッドを通るNurbs曲面を作成する。
 /// @param [in]  pts     点グリッド (P_u0v0、 P_u1v0、P_u2v0、...、P_u0v1、P_u1v1、... の順に並べる)
@@ -464,7 +499,7 @@ ONGEO_DECL bool ONGEO_FitNurbsCurveToPointArray(const ON_3dPoint *pts, int pt_cn
 /// @param [in]  u_order Nurbs曲面のU方向階数
 /// @param [in]  v_order Nurbs曲面のV方向階数
 /// @param [in]  pmethod 曲線パラメータの計算方法
-/// @param [put] nf      作成した Nurbs曲面
+/// @param [out] nf      作成した Nurbs曲面
 /// @param [in]  solver  連立一次方程式をどの方法で解くか？
 /// @return true:成功、false:失敗
 ONGEO_DECL bool ONGEO_FitNurbsSurfaceToPointGrid(const ON_3dPoint *pts, int u_count, int v_count, int u_order, int v_order, ONGEO_NI_ParameterMethod pmethod, ON_NurbsSurface &nf, ONGEO_NI_Solver solver = ONGEO_NI_Solver_ON_Matrix_Inverse);
