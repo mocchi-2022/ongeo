@@ -512,7 +512,7 @@ double ONGEO_FitNurbsCurveToPointArray_AdaptiveKnotSelection(const ON_3dPoint *p
 	int kp_cnt = KappaParametrization(pts, pt_cnt, enp, kappa_integral.First(), selected_indices_->First());
 	int kp_aksg_cnt = kp_cnt;
 	for(;;){
-		int aksg_cnt = AdaptiveKnotSequenceGeneration(pts, pt_cnt, prm_, selected_indices_->First(), kp_aksg_cnt, 4.0, selected_indices_->First() + kp_aksg_cnt);
+		int aksg_cnt = AdaptiveKnotSequenceGeneration(pts, pt_cnt, prm_, selected_indices_->First(), kp_aksg_cnt, 3.0, selected_indices_->First() + kp_aksg_cnt);
 		if (aksg_cnt == 0) break;
 		kp_aksg_cnt += aksg_cnt;
 		ON_SortIntArray(ON::heap_sort, selected_indices_->First(), kp_aksg_cnt);
