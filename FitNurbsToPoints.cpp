@@ -404,6 +404,9 @@ int KappaParametrization(const ON_3dPoint *pts, int pt_cnt, int enp, const doubl
 		if (ki_inv < 0 || ki_inv == ki_cnt_search) return -1;
 		if (ki_inv > 0) ki_cursor += ki_inv, pt_indices_selected[n++] = ki_cursor;
 	}
+	if (pt_indices_selected[n-1] != pt_cnt - 1){
+		pt_indices_selected[n-1] = pt_cnt - 1;
+	}
 	return n;
 }
 
