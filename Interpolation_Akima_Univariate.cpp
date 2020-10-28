@@ -81,7 +81,11 @@ struct ONGEO_Interpolation_Akima_Univariate::Impl{
 				else if (m2[i] == m3[i]) ta[ji+i] = m2[i];
 				else{
 					double m4_3 = std::abs(m4[i]-m3[i]), m2_1 = std::abs(m2[i]-m1[i]);
-					ta[ji+i] = (m4_3 * m2[i] + m2_1 * m3[i]) / (m4_3 + m2_1);
+					if (m2_1 == 0 && m4_3 == 0){
+						ta[ji+i] = (m2[i] + m3[i]) * 0.5;
+					}else{
+						ta[ji+i] = (m4_3 * m2[i] + m2_1 * m3[i]) / (m4_3 + m2_1);
+					}
 				}
 			}
 		}
