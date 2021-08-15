@@ -495,8 +495,8 @@ double ONGEO_FitNurbsCurveToPointArray_AdaptiveKnotSelection(const ON_3dPoint *p
 	ON_SimpleArray<int> selected_indices;
 	if (selected_indices_ == 0){
 		selected_indices_ = &selected_indices;
-		selected_indices.SetCapacity(pt_cnt); selected_indices.SetCount(pt_cnt);
 	}
+	selected_indices_->SetCapacity(pt_cnt); selected_indices_->SetCount(pt_cnt);
 
 	// ƒgƒŒƒ‰ƒ“ƒX‚©‚ç‘å‚Ü‚©‚È sigma ‚ğ‹‚ß‚éB
 	double sigma;
