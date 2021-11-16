@@ -9,7 +9,6 @@
 //   "DeWall: A Fast Divide & Conquer Delaunay Triangulation Algorithm in E^d".
 //     Computer Aided Design 1998, Vol 30, Pages 333–341
 
-#define NOMINMAX
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
@@ -21,6 +20,13 @@
 
 #include "ONGEO.h"
 #include "Profile.h"
+
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
 
 
 template <int N> struct traits{

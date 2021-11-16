@@ -326,10 +326,10 @@ bool ONGEO_IgesModel::Save(const char *filename){
 		while(slen){
 			++lnum;
 			if (slen >= 72){
-				fprintf(fp, "%s%c%7d\n", s.Mid((lnum - 1) * 72, 72), mark[i], lnum);
+				std::fprintf(fp, "%s%c%7d\n", s.Mid((lnum - 1) * 72, 72).Array(), mark[i], lnum);
 				slen -= 72;
 			}else{
-				fprintf(fp, "%s%s%c%7d\n", s.Mid((lnum - 1) * 72), ON_String(' ', 72 - slen), mark[i], lnum);
+				std::fprintf(fp, "%s%s%c%7d\n", s.Mid((lnum - 1) * 72).Array(), ON_String(' ', 72 - slen).Array(), mark[i], lnum);
 				slen = 0;
 			}
 		}
@@ -352,17 +352,17 @@ bool ONGEO_IgesModel::Save(const char *filename){
 		while(slen){
 			++lnum;
 			if (slen >= 64){
-				std::fprintf(fp, "%s %7dP%7d\n", s.Mid(sindex, 64), ldes, lnum);
+				std::fprintf(fp, "%s %7dP%7d\n", s.Mid(sindex, 64).Array(), ldes, lnum);
 				slen -= 64;
 				sindex += 64;
 			}else{
-				std::fprintf(fp, "%s%s %7dP%7d\n", s.Mid(sindex), ON_String(' ', 64 - slen), ldes, lnum);
+				std::fprintf(fp, "%s%s %7dP%7d\n", s.Mid(sindex).Array(), ON_String(' ', 64 - slen).Array(), ldes, lnum);
 				slen = 0;
 			}
 		}
 	}
 	// TerminalƒZƒNƒVƒ‡ƒ“
-	std::fprintf(fp, "S%7dG%7dD%7dP%7d%sT      1\n", lnums[0], lnums[1], lnums[2], lnums[3], ON_String(' ', 40));
+	std::fprintf(fp, "S%7dG%7dD%7dP%7d%sT      1\n", lnums[0], lnums[1], lnums[2], lnums[3], ON_String(' ', 40).Array());
 
 	::fclose(fp);
 	return true;

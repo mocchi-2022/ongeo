@@ -293,10 +293,6 @@ double ONGEO_FitNurbsCurveToPointArray_LeastSquare(const ON_3dPoint *pts, int pt
 		solver = &solver_omi;
 	}
 
-	ON_NurbsCurve pol;
-	ONGEO_FitNurbsCurveToPointArray(pts, pt_cnt, 2, pmethod, pol, solver_id);
-
-	int n = pt_cnt - 1;
 	ON_ClassArray<double> prm_buf;
 	double *prm = prm_;
 	if (!prm){
@@ -304,6 +300,10 @@ double ONGEO_FitNurbsCurveToPointArray_LeastSquare(const ON_3dPoint *pts, int pt
 		prm_buf.SetCount(pt_cnt);
 		prm = prm_buf.First();
 	}
+	int n = pt_cnt - 1;
+	ON_NurbsCurve pol;
+	ONGEO_FitNurbsCurveToPointArray(pts, pt_cnt, 2, pmethod, pol, 0, solver_id);
+
 	for (int i = 0; i < n+1; ++i){
 		prm[i] = pol.Knot(i);
 	}

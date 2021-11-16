@@ -1,13 +1,20 @@
 ﻿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
-#define NOMINMAX
 #include <cmath>
-#include <xutility>
 #include <limits>
 #include <vector>
 #include <windows.h>
+#include <algorithm>
+
 #include "ONGEO.h"
+
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
 
 // 多項式関数に値を代入して計算する。
 // @param [in] t 代入する値

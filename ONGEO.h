@@ -1,5 +1,8 @@
 ﻿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
+#ifndef ONGEO_H_79BA7A2D_02F4_4E11_9039_F6000096E02F
+#define ONGEO_H_79BA7A2D_02F4_4E11_9039_F6000096E02F
+
 #include "opennurbs.h"
 
 #ifdef _MSC_VER
@@ -625,3 +628,5 @@ ONGEO_DECL bool ONGEO_ReadTextSTL(ON_BinaryArchive &ba, ON_Mesh &mesh, ON_String
 /// 与えられた点列から、DeWall法でドロネー三角形分割を施す
 ONGEO_DECL bool ONGEO_DelaunayTriangulation_2D_DeWall(const ON_2dPoint *pts, int num_pts, ON_SimpleArray<int> &simplexes);
 ONGEO_DECL bool ONGEO_DelaunayTriangulation_2D_DeWall(const double *pts, int num_pts, ON_SimpleArray<int> &simplexes);
+
+#endif // ONGEO_H_79BA7A2D_02F4_4E11_9039_F6000096E02F

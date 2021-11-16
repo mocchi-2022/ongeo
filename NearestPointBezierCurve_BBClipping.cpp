@@ -1,7 +1,5 @@
 ﻿// Copyright (C) Mocchi (mocchi_2003@yahoo.co.jp)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#define NOMINMAX
-
 #include "opennurbs.h"
 #include "ONGEO.h"
 
@@ -12,8 +10,16 @@
 #include <list>
 #include <set>
 #include <map>
+#include <algorithm>
 
 #include <cstdio>
+
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
 
 namespace{
 	template <int N> struct rotator{
